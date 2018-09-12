@@ -1,0 +1,164 @@
+package com.nvans.tyrannophone.model.entity;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Set;
+
+@Entity
+@Table(name = "user")
+public class User implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @Column(name = "user_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long userId;
+
+    @Column(name = "user_name", nullable = false, unique = true, updatable = false)
+    private String userName;
+
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+
+    @Column(name = "password", nullable = false)
+    private String password;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles;
+
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinTable(name = "blocked_user",
+            joinColumns = @JoinColumn(name = "user_id",
+                    referencedColumnName = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "block_details_id",
+                    referencedColumnName = "id")
+    )
+    private BlockDetails blockDetails;
+
+    @Column(name = "last_activity_ts")
+    private LocalDateTime lastActivityTS;
+
+    @Column(name = "create_ts", updatable = false, nullable = false)
+    private LocalDateTime createTS;
+
+    @Version
+    @Column(name = "update_ts", nullable = false)
+    private LocalDateTime updateTS;
+
+
+    /**
+     * Method adds current timestamp
+     * when the user persisted first time.
+     */
+    @PrePersist
+    private void onCreate() {
+        this.createTS = LocalDateTime.now();
+    }
+
+    // Getters and Setters -->
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public BlockDetails getBlockDetails() {
+        return blockDetails;
+    }
+
+    public void setBlockDetails(BlockDetails blockDetails) {
+        this.blockDetails = blockDetails;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public LocalDateTime getLastActivityTS() {
+        return lastActivityTS;
+    }
+
+    public void setLastActivityTS(LocalDateTime lastActivityTS) {
+        this.lastActivityTS = lastActivityTS;
+    }
+
+    public LocalDateTime getCreateTS() {
+        return createTS;
+    }
+
+    public void setCreateTS(LocalDateTime createTS) {
+        this.createTS = createTS;
+    }
+
+    public LocalDateTime getUpdateTS() {
+        return updateTS;
+    }
+
+    public void setUpdateTS(LocalDateTime updateTS) {
+        this.updateTS = updateTS;
+    }
+    // <-- Getters and Setters
+
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId=" + userId +
+                ", userName='" + userName + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", roles=" + roles +
+                ", isActive=" + isActive +
+                ", blockDetails=" + blockDetails +
+                ", lastActivityTS=" + lastActivityTS +
+                ", createTS=" + createTS +
+                ", updateTS=" + updateTS +
+                '}';
+    }
+}
