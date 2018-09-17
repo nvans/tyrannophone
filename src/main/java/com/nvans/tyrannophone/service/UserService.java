@@ -1,11 +1,11 @@
 package com.nvans.tyrannophone.service;
 
 
-import com.nvans.tyrannophone.dto.UserDto;
+import com.nvans.tyrannophone.model.entity.User;
 
 public interface UserService {
 
-    void registerNewUser(UserDto userDto);
+    User getUser(Long id);
 
 
 }

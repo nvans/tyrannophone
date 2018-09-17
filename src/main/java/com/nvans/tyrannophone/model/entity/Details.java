@@ -3,11 +3,12 @@ package com.nvans.tyrannophone.model.entity;
 import javax.persistence.*;
 import java.io.Serializable;
 
-@MappedSuperclass
-public abstract class UserDetails implements Serializable {
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+public abstract class Details implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
@@ -23,8 +24,11 @@ public abstract class UserDetails implements Serializable {
     @Column(name = "address", nullable = false)
     private String address;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false, unique = true, updatable = false)
+
+
+    @MapsId
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id")
     private User user;
 
     // Getters and Setters -->

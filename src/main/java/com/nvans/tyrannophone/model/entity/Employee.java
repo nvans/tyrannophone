@@ -1,10 +1,12 @@
 package com.nvans.tyrannophone.model.entity;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "employee")
-public class Employee extends UserDetails {
+public class Employee extends Details {
 
     private static final long serialVersionUID = 1L;
 
@@ -14,6 +16,15 @@ public class Employee extends UserDetails {
     @ManyToOne
     @JoinColumn(name = "manager_id")
     private Employee manager;
+
+    @ManyToMany
+    @JoinTable(name = "employee_contract",
+            joinColumns = {@JoinColumn(name = "employee_id",
+                    referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "contract_number",
+                    referencedColumnName = "contract_number",
+                    unique = true)})
+    private Set<Contract> contracts = new HashSet<>();
 
 
     // Getters and Setters -->
@@ -32,6 +43,14 @@ public class Employee extends UserDetails {
 
     public void setManager(Employee manager) {
         this.manager = manager;
+    }
+
+    public Set<Contract> getContracts() {
+        return contracts;
+    }
+
+    public void setContracts(Set<Contract> contracts) {
+        this.contracts = contracts;
     }
 
     // <-- Getters and Setters

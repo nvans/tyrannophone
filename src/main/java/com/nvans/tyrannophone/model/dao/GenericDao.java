@@ -3,9 +3,8 @@ package com.nvans.tyrannophone.model.dao;
 import java.io.Serializable;
 import java.util.List;
 
-public interface GenericJpaDao<T extends Serializable> {
 
-    //void setEntityClass(Class<T> entityClass);
+public interface GenericDao<T extends Serializable> {
 
     T findById(Long id);
 
@@ -18,5 +17,9 @@ public interface GenericJpaDao<T extends Serializable> {
     void deleteById(Long id);
 
     void delete(T entity);
+
+    T findByParam(String param, Object value);
+
+    List<T> findAllByParam(String param, Object value);
 
 }

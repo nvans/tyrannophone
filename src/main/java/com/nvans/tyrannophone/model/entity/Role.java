@@ -20,6 +20,7 @@ public class Role implements Serializable {
 
     @ManyToMany(mappedBy = "roles")
     private Set<User> users;
+
     // Getters and Setters -->
 
     public Long getRoleId() {

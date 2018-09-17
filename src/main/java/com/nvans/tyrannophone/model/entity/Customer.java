@@ -6,20 +6,20 @@ import java.util.Set;
 
 @Entity
 @Table(name = "customer")
-public class Customer extends UserDetails {
+public class Customer extends Details {
 
     private static final long serialVersionUID = 1L;
 
     @Column(name = "balance", nullable = false)
     private Integer balance;
 
-    @ManyToMany(cascade = CascadeType.REMOVE)
-    @JoinTable(name = "customer_contract",
-               joinColumns = {@JoinColumn(name = "customer_id",
-                                          referencedColumnName = "id")},
-               inverseJoinColumns = {@JoinColumn(name = "contract_number",
-                                                 referencedColumnName = "contract_number",
-                                                 unique = true)})
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
+//    @JoinTable(name = "customer_contract",
+//               joinColumns = {@JoinColumn(name = "customer_id",
+//                                          referencedColumnName = "id")},
+//               inverseJoinColumns = {@JoinColumn(name = "contract_number",
+//                                                 referencedColumnName = "contract_number",
+//                                                 unique = true)})
     private Set<Contract> contracts = new HashSet<>();
 
     // Getters and Setters -->

@@ -2,6 +2,7 @@ package com.nvans.tyrannophone.model.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Set;
 
 @Entity
 @Table(name = "contract")
@@ -17,6 +18,21 @@ public class Contract implements Serializable {
     @OneToOne
     @JoinColumn(name = "plan_id", nullable = false)
     private Plan plan;
+
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    @ManyToOne
+    @JoinTable(name = "customer_contract",
+            joinColumns = @JoinColumn(name = "contract_number"),
+            inverseJoinColumns = @JoinColumn(name = "customer_id"))
+    private Customer customer;
 
     @Column
     private boolean isBlocked;
@@ -46,6 +62,23 @@ public class Contract implements Serializable {
     public void setPlan(Plan plan) {
         this.plan = plan;
     }
+
+    public boolean isBlocked() {
+        return isBlocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        isBlocked = blocked;
+    }
+
+    public BlockDetails getBlockDetails() {
+        return blockDetails;
+    }
+
+    public void setBlockDetails(BlockDetails blockDetails) {
+        this.blockDetails = blockDetails;
+    }
+
     // <-- Getters and Setters
 
 

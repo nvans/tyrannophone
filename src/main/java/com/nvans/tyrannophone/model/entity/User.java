@@ -1,8 +1,12 @@
 package com.nvans.tyrannophone.model.entity;
 
+//import com.nvans.tyrannophone.model.dao.BaseEntity;
+
 import javax.persistence.*;
+//import java.io.Serializable;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -12,9 +16,9 @@ public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name = "user_id")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private Long id;
 
     @Column(name = "user_name", nullable = false, unique = true, updatable = false)
     private String userName;
@@ -29,19 +33,16 @@ public class User implements Serializable {
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinTable(name = "blocked_user",
-            joinColumns = @JoinColumn(name = "user_id",
-                    referencedColumnName = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "block_details_id",
-                    referencedColumnName = "id")
-    )
+    @OneToOne(mappedBy = "blockedUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private BlockDetails blockDetails;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Details details;
 
     @Column(name = "last_activity_ts")
     private LocalDateTime lastActivityTS;
@@ -64,12 +65,12 @@ public class User implements Serializable {
     }
 
     // Getters and Setters -->
-    public Long getUserId() {
-        return userId;
+    public Long getId() {
+        return id;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getUserName() {
@@ -102,6 +103,14 @@ public class User implements Serializable {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public Details getDetails() {
+        return details;
+    }
+
+    public void setDetails(Details details) {
+        this.details = details;
     }
 
     public BlockDetails getBlockDetails() {
@@ -149,13 +158,13 @@ public class User implements Serializable {
     @Override
     public String toString() {
         return "User{" +
-                "userId=" + userId +
+//                "userId=" + id +
                 ", userName='" + userName + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
-                ", roles=" + roles +
+//                ", roles=" + roles +
                 ", isActive=" + isActive +
-                ", blockDetails=" + blockDetails +
+//                ", blockDetails=" + blockDetails +
                 ", lastActivityTS=" + lastActivityTS +
                 ", createTS=" + createTS +
                 ", updateTS=" + updateTS +

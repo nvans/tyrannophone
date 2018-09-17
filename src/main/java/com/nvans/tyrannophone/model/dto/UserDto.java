@@ -1,4 +1,4 @@
-package com.nvans.tyrannophone.dto;
+package com.nvans.tyrannophone.model.dto;
 
 import com.nvans.tyrannophone.model.entity.Role;
 

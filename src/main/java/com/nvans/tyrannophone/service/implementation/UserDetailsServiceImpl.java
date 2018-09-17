@@ -1,6 +1,7 @@
 package com.nvans.tyrannophone.service.implementation;
 
-import com.nvans.tyrannophone.model.dao.UserDao;
+import com.nvans.tyrannophone.model.dao.GenericDao;
+import com.nvans.tyrannophone.model.dto.CustomUserPrinciple;
 import com.nvans.tyrannophone.model.entity.Role;
 import com.nvans.tyrannophone.model.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,27 +20,29 @@ import java.util.Set;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
-    UserDao userDao;
+    GenericDao<User> userDao;
 
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
 
-        User user = userDao.findByUserName(userName.toLowerCase());
+        User user = userDao.findByParam("userName", userName.toLowerCase());
+
+        if (user == null) {
+            throw new UsernameNotFoundException("User with name \"" + userName + "\" doesn't exist");
+        }
 
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
         for(Role role : user.getRoles()) {
             grantedAuthorities.add(new SimpleGrantedAuthority(role.getRole()));
         }
 
-        return new org.springframework.security.core.userdetails.User(
-                user.getUserName(),
-                user.getPassword(),
-                user.isActive(),
-                true,
-                true,
-                true,
-                grantedAuthorities
-        );
+        return new CustomUserPrinciple(
+                user.getUserName(), user.getPassword(),
+                user.isActive(), user.isActive(),
+                user.isActive(), user.isActive(),
+                grantedAuthorities, user.getId());
     }
+
+
 }

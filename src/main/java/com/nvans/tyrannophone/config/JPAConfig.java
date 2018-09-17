@@ -1,10 +1,7 @@
 package com.nvans.tyrannophone.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -22,6 +19,7 @@ import java.util.Properties;
 @Configuration
 @EnableTransactionManagement
 @ComponentScan(basePackages = { "com.nvans.tyrannophone.model" })
+@Import(DaoBeans.class)
 @PropertySource(value = "classpath:application.properties")
 public class JPAConfig {
 
@@ -78,4 +76,9 @@ public class JPAConfig {
     public PlatformTransactionManager transactionManager() {
         return new JpaTransactionManager(entityManagerFactory());
     }
+
+//    @Bean
+//    public GenericDao<User> userDao() {
+//        return new GenericDaoImpl<>(User.class);
+//    }
 }
