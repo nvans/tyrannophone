@@ -2,7 +2,6 @@ package com.nvans.tyrannophone.model.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Set;
 
 @Entity
 @Table(name = "contract")
@@ -34,9 +33,10 @@ public class Contract implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "customer_id"))
     private Customer customer;
 
-    @Column
-    private boolean isBlocked;
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive;
 
+    // TODO: Unidirectional
     @OneToOne(cascade = CascadeType.ALL)
     @JoinTable(name = "blocked_contract",
            joinColumns = @JoinColumn(name = "contract_number",
@@ -63,12 +63,12 @@ public class Contract implements Serializable {
         this.plan = plan;
     }
 
-    public boolean isBlocked() {
-        return isBlocked;
+    public boolean isActive() {
+        return isActive;
     }
 
-    public void setBlocked(boolean blocked) {
-        isBlocked = blocked;
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public BlockDetails getBlockDetails() {

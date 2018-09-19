@@ -31,6 +31,11 @@ public class BlockDetails implements Serializable {
     @JoinColumn(name = "id")
     private User blockedUser;
 
+//    @MapsId
+//    @OneToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "contract_number")
+//    private Contract contract;
+
     /**
      * Method adds current timestamp
      * when the user persisted first time.

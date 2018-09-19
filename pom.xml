@@ -35,8 +35,8 @@
                 <version>2.2</version>
                 <configuration>
                     <path>/Tyrannophone</path>
-                    <!--<username>admin</username>-->
-                    <!--<password>admin</password>-->
+                    <username>tyrannophone</username>
+                    <password>tyrannophone</password>
                 </configuration>
             </plugin>
         </plugins>

@@ -52,7 +52,7 @@ public class DaoTest {
     @Transactional
     public void testFindUserByID() {
 
-        /*createRoles();
+        createRoles();
         createPlans();
 
         List<Role> roleList = roleDao.findAll();
@@ -105,7 +105,7 @@ public class DaoTest {
         User adm = userDao.findByParam("email", "admin1@tyrannophone.com");
         System.out.println(cust1.getBlockDetails());
         //List<User> list = userDao.findAllByParam("role", "ROLE_ADMIN");
-        System.out.println();*/
+        System.out.println();
 
     }
 
@@ -160,7 +160,7 @@ public class DaoTest {
 //            Contract contract1 = new Contract();
 //            contract1.setContractNumber(initialContractNum++);
 //            contract1.setPlan(plan);
-//            contract1.setBlocked(false);
+//            contract1.setActive(false);
 //
 //            contractDao.create(contract1);
 //        }
