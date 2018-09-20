@@ -2,7 +2,6 @@ package com.nvans.tyrannophone.config;
 
 import com.nvans.tyrannophone.model.dao.GenericDao;
 import com.nvans.tyrannophone.model.dao.GenericDaoImpl;
-import com.nvans.tyrannophone.model.dto.CustomUserPrinciple;
 import com.nvans.tyrannophone.model.entity.*;
 import org.springframework.context.annotation.Bean;
 

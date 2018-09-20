@@ -24,5 +24,34 @@
     </div>
 </nav>
 
-<%--<%@include file="login.jsp"%>--%>
-<c:import url="WEB-INF/views/templates/login.jsp" />
+<sec:authorize access="isAnonymous()">
+    <div class="modal fade" id="login-modal">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <!-- header -->
+                <div class="modal-header">
+                    <h3 class="modal-title">Login Form</h3>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- body -->
+                <div class="modal-header">
+                    <form role="form" method="post" id="login-form" action="${pageContext.request.contextPath}/login">
+                        <div class="form-group">
+                            <input id="loguser" type="text" name="username" class="form-control" placeholder="Email"/>
+                            <input type="password" name="password" class="form-control" placeholder="Password" />
+                        </div>
+                    </form>
+                </div>
+                <!-- footer -->
+                <div class="modal-footer">
+                    <button name="submit" type="submit" class="btn btn-primary btn-block" form="login-form">Log In</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $('.modal').on('shown.bs.modal', function() {
+            $(this).find('#logUser').focus();
+        });
+    </script>
+</sec:authorize>

@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 public class BlockDetails implements Serializable {
 
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    //@Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @ManyToOne
@@ -26,15 +26,6 @@ public class BlockDetails implements Serializable {
     @Column(name = "block_ts", updatable = false, nullable = false)
     private LocalDateTime blockTs;
 
-    @MapsId
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id")
-    private User blockedUser;
-
-//    @MapsId
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "contract_number")
-//    private Contract contract;
 
     /**
      * Method adds current timestamp
@@ -83,14 +74,6 @@ public class BlockDetails implements Serializable {
 
     public void setBlockTs(LocalDateTime blockTs) {
         this.blockTs = blockTs;
-    }
-
-    public User getBlockedUser() {
-        return blockedUser;
-    }
-
-    public void setBlockedUser(User blockedUser) {
-        this.blockedUser = blockedUser;
     }
 
     //    @Override

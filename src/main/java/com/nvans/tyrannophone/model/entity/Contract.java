@@ -15,17 +15,8 @@ public class Contract implements Serializable {
 
 
     @OneToOne
-    @JoinColumn(name = "plan_id", nullable = false)
+    @JoinColumn(name = "plan_id")
     private Plan plan;
-
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-    }
 
     @ManyToOne
     @JoinTable(name = "customer_contract",
@@ -36,14 +27,10 @@ public class Contract implements Serializable {
     @Column(name = "is_active", nullable = false)
     private boolean isActive;
 
-    // TODO: Unidirectional
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinTable(name = "blocked_contract",
-           joinColumns = @JoinColumn(name = "contract_number",
-                                     referencedColumnName = "contract_number"),
-           inverseJoinColumns = @JoinColumn(name = "block_details_id",
-                                            referencedColumnName = "id")
-               )
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinTable(name = "contract_block_details",
+           joinColumns = @JoinColumn(name = "contract_number", referencedColumnName = "contract_number"),
+           inverseJoinColumns = @JoinColumn(name = "block_details_id", referencedColumnName = "id"))
     private BlockDetails blockDetails;
 
     // Getters and Setters -->
@@ -63,6 +50,14 @@ public class Contract implements Serializable {
         this.plan = plan;
     }
 
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
     public boolean isActive() {
         return isActive;
     }
@@ -78,6 +73,7 @@ public class Contract implements Serializable {
     public void setBlockDetails(BlockDetails blockDetails) {
         this.blockDetails = blockDetails;
     }
+
 
     // <-- Getters and Setters
 

@@ -3,11 +3,12 @@ package com.nvans.tyrannophone.model.entity;
 //import com.nvans.tyrannophone.model.dao.BaseEntity;
 
 import javax.persistence.*;
-//import java.io.Serializable;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+
+//import java.io.Serializable;
 
 @Entity
 @Table(name = "user")
@@ -38,7 +39,10 @@ public class User implements Serializable {
     @Column(name = "is_active", nullable = false)
     private boolean isActive;
 
-    @OneToOne(mappedBy = "blockedUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne
+    @JoinTable(name = "user_block_details",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "block_id", referencedColumnName = "id", unique = true))
     private BlockDetails blockDetails;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

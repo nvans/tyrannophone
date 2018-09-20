@@ -8,7 +8,7 @@
 </head>
 <body>
     <div><%@include file="WEB-INF/views/templates/navigation.jsp" %></div>
-    <div><%@ include file="WEB-INF/views/templates/customer-navigation.jsp"%></div>
+    <div><%@include file="WEB-INF/views/templates/customer-navigation.jsp"%></div>
 
 </body>
 </html>

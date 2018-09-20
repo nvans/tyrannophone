@@ -1,11 +1,9 @@
 package com.nvans.tyrannophone.model.dao;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.io.Serializable;
-import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
 public abstract class AbstractGenericDao<T extends Serializable> implements GenericDao<T>{
@@ -16,6 +14,7 @@ public abstract class AbstractGenericDao<T extends Serializable> implements Gene
     protected EntityManager entityManager;
 
     public AbstractGenericDao() {
+
     }
 
     public AbstractGenericDao(Class<T> type) {

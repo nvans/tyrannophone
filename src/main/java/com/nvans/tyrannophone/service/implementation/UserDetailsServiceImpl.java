@@ -1,9 +1,9 @@
 package com.nvans.tyrannophone.service.implementation;
 
 import com.nvans.tyrannophone.model.dao.GenericDao;
-import com.nvans.tyrannophone.model.dto.CustomUserPrinciple;
 import com.nvans.tyrannophone.model.entity.Role;
 import com.nvans.tyrannophone.model.entity.User;
+import com.nvans.tyrannophone.model.security.CustomUserPrinciple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,6 +32,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("User with name \"" + userName + "\" doesn't exist");
         }
+
+        user.setLastActivityTS(LocalDateTime.now());
 
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
         for(Role role : user.getRoles()) {

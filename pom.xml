@@ -148,6 +148,7 @@
             <version>${jstl.version}</version>
         </dependency>
 
+        <!--                             *** W E B  U I ***                          -->
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>bootstrap</artifactId>
@@ -167,7 +168,6 @@
         </dependency>
 
         <!--                              *** T E S T I N G ***                      -->
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
@@ -181,7 +181,6 @@
           <version>${junit.version}</version>
           <scope>test</scope>
         </dependency>
-
 
     </dependencies>
 

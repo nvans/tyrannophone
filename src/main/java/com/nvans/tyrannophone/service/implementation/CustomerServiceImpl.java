@@ -1,43 +1,51 @@
 package com.nvans.tyrannophone.service.implementation;
 
-import com.nvans.tyrannophone.model.dao.CustomerDao;
+import com.nvans.tyrannophone.model.dao.ContractDao;
 import com.nvans.tyrannophone.model.dao.GenericDao;
+import com.nvans.tyrannophone.model.dto.CustomerDto;
 import com.nvans.tyrannophone.model.entity.Contract;
 import com.nvans.tyrannophone.model.entity.Customer;
+import com.nvans.tyrannophone.model.entity.User;
+import com.nvans.tyrannophone.model.security.CustomUserPrinciple;
 import com.nvans.tyrannophone.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Service
-@Transactional
 public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
-    private GenericDao<Contract> contractDao;
+    private ContractDao contractDao;
+
+    @Autowired
+    private GenericDao<User> userDao;
 
     @Autowired
     private GenericDao<Customer> customerDao;
 
-
     @Override
-    public Customer getCustomerDetails(Long customerId) {
+    @Transactional(readOnly = true)
+    public CustomerDto getCustomerDetails() {
 
-        return customerDao.findById(customerId);
+        CustomUserPrinciple currentUser =
+                (CustomUserPrinciple) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        User user = userDao.findById(currentUser.getUserId());
+
+        return new CustomerDto(user);
     }
 
     @Override
-    public Set<Contract> getContracts(Long customerId) {
+    @Transactional(readOnly = true)
+    public Set<Contract> getContracts() {
 
-        List<Contract> contr = contractDao.findAllByParam("customer.id", customerId);
+        CustomUserPrinciple currentUser =
+                (CustomUserPrinciple) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        Set<Contract> contracts = new HashSet<>(contr);
-
-        return contracts;
-
+        return contractDao.getAllByCustomerId(currentUser.getUserId());
     }
 }
