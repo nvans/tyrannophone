@@ -31,8 +31,8 @@ public class Plan implements Serializable {
     @Column(name = "is_connection_available", nullable = false)
     private Boolean isConnectionAvailable;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "plan_option",
+    @ManyToMany
+    @JoinTable(name = "plan_available_option",
             joinColumns = @JoinColumn(name = "plan_id",
                     referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "option_id",

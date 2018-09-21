@@ -39,19 +39,7 @@ public class CustomerController {
 
         CustomerDto customer = customerService.getCustomerDetails();
 
-
-        ModelAndView modelView = new ModelAndView("customer/profile");
-
-        Map<String, String> profileDetails = new HashMap<>();
-        profileDetails.put("Email", customer.getEmail());
-        profileDetails.put("First name", customer.getFirstName());
-        profileDetails.put("Last name", customer.getLastName());
-        profileDetails.put("Address", customer.getAddress());
-        profileDetails.put("Passport", customer.getPassport());
-
-        modelView.addObject("details", profileDetails);
-
-        return modelView;
+        return new ModelAndView("customer/profile", "customer", customer);
     }
 
 

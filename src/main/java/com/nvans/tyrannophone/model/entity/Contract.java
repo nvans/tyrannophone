@@ -2,6 +2,7 @@ package com.nvans.tyrannophone.model.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Set;
 
 @Entity
 @Table(name = "contract")
@@ -26,6 +27,12 @@ public class Contract implements Serializable {
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "contract_option",
+            joinColumns = @JoinColumn(name = "contract_number"),
+            inverseJoinColumns = @JoinColumn(name = "option_id"))
+    private Set<Option> options;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinTable(name = "contract_block_details",
@@ -64,6 +71,14 @@ public class Contract implements Serializable {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public Set<Option> getOptions() {
+        return options;
+    }
+
+    public void setOptions(Set<Option> options) {
+        this.options = options;
     }
 
     public BlockDetails getBlockDetails() {

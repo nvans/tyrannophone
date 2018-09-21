@@ -16,25 +16,26 @@ public class Option {
     @Column(name = "name", nullable = false, unique = true, updatable = false)
     private String name;
 
-    @Column(name = "connection_price")
-    private Integer connectionPrice;
-
-    @Column(name = "monthly_price")
-    private Integer monthlyPrice;
+    @Column(name = "price")
+    private Integer price;
 
     @Column(name = "is_available")
     private boolean isConnectionAvailable;
 
     @OneToMany
-    @JoinTable(name = "incompatible_options",
+    @JoinTable(name = "option_incompatible_option",
         joinColumns = @JoinColumn(name = "option_id", referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name = "inc_option", referencedColumnName = "id"))
+        inverseJoinColumns = @JoinColumn(name = "inc_option_id", referencedColumnName = "id"))
     private Set<Option> incompatibleOptions;
 
-    // Constructor
-    public Option() {
-        incompatibleOptions = new HashSet<>();
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinTable(name = "option_dependencies",
+            joinColumns = @JoinColumn(name = "parent_option_id"),
+            inverseJoinColumns = @JoinColumn(name = "child_option_id"))
+    private Option parentOption;
+
+    @OneToMany(mappedBy = "parentOption")
+    private Set<Option> childOptions;
 
     // Getters and Setters -->
 
@@ -54,20 +55,12 @@ public class Option {
         this.name = name;
     }
 
-    public Integer getConnectionPrice() {
-        return connectionPrice;
+    public Integer getPrice() {
+        return price;
     }
 
-    public void setConnectionPrice(Integer connectionPrice) {
-        this.connectionPrice = connectionPrice;
-    }
-
-    public Integer getMonthlyPrice() {
-        return monthlyPrice;
-    }
-
-    public void setMonthlyPrice(Integer monthlyPrice) {
-        this.monthlyPrice = monthlyPrice;
+    public void setPrice(Integer price) {
+        this.price = price;
     }
 
     public boolean isConnectionAvailable() {
@@ -86,6 +79,21 @@ public class Option {
         this.incompatibleOptions = incompatibleOptions;
     }
 
+    public Option getParentOption() {
+        return parentOption;
+    }
+
+    public void setParentOption(Option parentOption) {
+        this.parentOption = parentOption;
+    }
+
+    public Set<Option> getChildOptions() {
+        return childOptions;
+    }
+
+    public void setChildOptions(Set<Option> childOptions) {
+        this.childOptions = childOptions;
+    }
 
     // <-- Getters and Setters
 
@@ -99,15 +107,13 @@ public class Option {
 
         if (isConnectionAvailable != option.isConnectionAvailable) return false;
         if (!name.equals(option.name)) return false;
-        if (!connectionPrice.equals(option.connectionPrice)) return false;
-        return monthlyPrice.equals(option.monthlyPrice);
+        return price.equals(option.price);
     }
 
     @Override
     public int hashCode() {
         int result = name.hashCode();
-        result = 31 * result + connectionPrice.hashCode();
-        result = 31 * result + monthlyPrice.hashCode();
+        result = 31 * result + price.hashCode();
         result = 31 * result + (isConnectionAvailable ? 1 : 0);
         return result;
     }

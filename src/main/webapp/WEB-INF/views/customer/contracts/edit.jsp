@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
 <html>
 <head>
-    <title>Title</title>
+    <title>Edit Contract</title>
     <%@include file="../../templates/header.jsp"%>
 </head>
 <body>
@@ -30,15 +30,19 @@
     </c:if>
 
     <c:if test="${contract.active}">
-        <form>
-            <label for="contract">Contract</label>
-            +<input type="text" id="contract" value="${contract.contractNumber}" readonly/><br/>
-            <label for="plan">Plan</label>
-            <input type="text" id="plan" value="${contract.plan}"><br/>
-        </form>
+        <div class="row">
+            <div class="col-3"></div>
+            <div class="col-6">
+                <form>
+                    <label for="contract">Contract</label>
+                    <input type="text" id="contract" value="${contract.contractNumber}" readonly/><br/>
+                    <label for="plan">Plan</label>
+                    <input type="text" id="plan" value="${contract.plan}"><br/>
+                </form>
+            </div>
+            <div class="col-3"></div>
+        </div>
 
-
-        <%--<a class="btn btn-primary btn-lg" href="${pageContext.request.contextPath}/customer/contracts/block/${contract.contractNumber}" role="button">Block</a>--%>
         <a class = "btn btn-primary btn-lg" data-toggle="modal" data-target="#block-modal" role="button">Block</a>
 
         <%-- Modal form block details --%>
@@ -73,6 +77,7 @@
             });
         </script>
     </c:if>
+
 </body>
 </html>
 
