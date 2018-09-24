@@ -1,21 +1,29 @@
 package com.nvans.tyrannophone.model.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.PositiveOrZero;
+import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "options")
-public class Option {
+public class Option implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
+    @Pattern(regexp = "^\\w[A-Za-z0-9()+ ]{3,}", message = "Invalid option name.")
     @Column(name = "name", nullable = false, unique = true, updatable = false)
     private String name;
 
+    @PositiveOrZero
     @Column(name = "price")
     private Integer price;
 
@@ -26,16 +34,16 @@ public class Option {
     @JoinTable(name = "option_incompatible_option",
         joinColumns = @JoinColumn(name = "option_id", referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name = "inc_option_id", referencedColumnName = "id"))
-    private Set<Option> incompatibleOptions;
+    private Set<Option> incompatibleOptions = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinTable(name = "option_dependencies",
             joinColumns = @JoinColumn(name = "parent_option_id"),
-            inverseJoinColumns = @JoinColumn(name = "child_option_id"))
+            inverseJoinColumns = @JoinColumn(name = "option_id"))
     private Option parentOption;
 
     @OneToMany(mappedBy = "parentOption")
-    private Set<Option> childOptions;
+    private Set<Option> childOptions = new HashSet<>();
 
     // Getters and Setters -->
 
@@ -85,6 +93,10 @@ public class Option {
 
     public void setParentOption(Option parentOption) {
         this.parentOption = parentOption;
+
+        if (parentOption != null) {
+            parentOption.getChildOptions().add(this);
+        }
     }
 
     public Set<Option> getChildOptions() {
@@ -102,19 +114,20 @@ public class Option {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Option option = (Option) o;
 
-        if (isConnectionAvailable != option.isConnectionAvailable) return false;
-        if (!name.equals(option.name)) return false;
-        return price.equals(option.price);
+        return isConnectionAvailable == option.isConnectionAvailable &&
+                Objects.equals(name, option.name) &&
+                Objects.equals(price, option.price);
     }
 
     @Override
     public int hashCode() {
-        int result = name.hashCode();
-        result = 31 * result + price.hashCode();
-        result = 31 * result + (isConnectionAvailable ? 1 : 0);
-        return result;
+        return Objects.hash(name, price, isConnectionAvailable);
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

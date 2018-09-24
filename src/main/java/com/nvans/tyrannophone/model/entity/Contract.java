@@ -14,8 +14,7 @@ public class Contract implements Serializable {
     @Column(name = "contract_number", length = 9)
     private Long contractNumber;
 
-
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "plan_id")
     private Plan plan;
 

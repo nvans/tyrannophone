@@ -60,5 +60,6 @@
                 <!-- /form user info -->
             </div>
         </div>
+    </div>
 </body>
 </html>

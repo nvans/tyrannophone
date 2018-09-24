@@ -2,7 +2,7 @@ package com.nvans.tyrannophone.model.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -10,9 +10,6 @@ import java.util.Set;
 public class Plan implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    public static final String FIND_ALL = "Plan.findAll";
-    public static final String FIND_BY_NAME = "Plan.findByName";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,15 +33,11 @@ public class Plan implements Serializable {
             joinColumns = @JoinColumn(name = "plan_id",
                     referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "option_id",
-                    referencedColumnName = "id")
-    )
+                    referencedColumnName = "id"))
     private Set<Option> availableOptions;
 
-    // Constructor
-
-    public Plan() {
-        availableOptions = new HashSet<>();
-    }
+    @OneToMany(mappedBy = "plan")
+    private Set<Contract> contracts;
 
 
     // Getters and Setters -->
@@ -97,6 +90,30 @@ public class Plan implements Serializable {
         this.availableOptions = availableOptions;
     }
 
+    public Set<Contract> getContracts() {
+        return contracts;
+    }
+
+    public void setContracts(Set<Contract> contracts) {
+        this.contracts = contracts;
+    }
 
     // <-- Getters and Setters
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Plan plan = (Plan) o;
+        return Objects.equals(planName, plan.planName) &&
+                Objects.equals(connectionPrice, plan.connectionPrice) &&
+                Objects.equals(monthlyPrice, plan.monthlyPrice) &&
+                Objects.equals(isConnectionAvailable, plan.isConnectionAvailable);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(planName, connectionPrice, monthlyPrice, isConnectionAvailable);
+    }
 }

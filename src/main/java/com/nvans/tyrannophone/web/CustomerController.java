@@ -3,7 +3,6 @@ package com.nvans.tyrannophone.web;
 import com.nvans.tyrannophone.model.dto.ContractDto;
 import com.nvans.tyrannophone.model.dto.CustomerDto;
 import com.nvans.tyrannophone.model.entity.Contract;
-import com.nvans.tyrannophone.service.BlockService;
 import com.nvans.tyrannophone.service.ContractService;
 import com.nvans.tyrannophone.service.CustomerService;
 import com.nvans.tyrannophone.service.UserService;
@@ -14,8 +13,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 @Controller
@@ -30,9 +27,6 @@ public class CustomerController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private BlockService blockService;
 
     @GetMapping("/profile")
     public ModelAndView getProfile() {
@@ -76,7 +70,7 @@ public class CustomerController {
     @PostMapping("/contracts/block")
     public RedirectView blockContract(@RequestParam Long contractNumber, @RequestParam String reason) {
 
-        blockService.blockContract(contractNumber, reason);
+        contractService.blockContract(contractNumber, reason);
 
         return new RedirectView(contractNumber.toString());
 
@@ -85,7 +79,7 @@ public class CustomerController {
     @GetMapping("/contracts/unblock/{contractNumber}")
     public RedirectView unblockContract(@PathVariable Long contractNumber) {
 
-        blockService.unblockContract(contractNumber);
+        contractService.unblockContract(contractNumber);
 
         return new RedirectView("../" + contractNumber);
     }

@@ -22,4 +22,6 @@ public interface GenericDao<T extends Serializable> {
 
     List<T> findAllByParam(String param, Object value);
 
+    long count();
+
 }

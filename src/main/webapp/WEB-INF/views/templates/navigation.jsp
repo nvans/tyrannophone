@@ -37,8 +37,8 @@
                 <div class="modal-header">
                     <form role="form" method="post" id="login-form" action="${pageContext.request.contextPath}/login">
                         <div class="form-group">
-                            <input id="loguser" type="text" name="username" class="form-control" placeholder="Email"/>
-                            <input type="password" name="password" class="form-control" placeholder="Password" />
+                            <input id="loguser" type="text" name="username" class="form-control" placeholder="Email or number" required/>
+                            <input type="password" name="password" class="form-control" placeholder="Password" required/>
                         </div>
                     </form>
                 </div>

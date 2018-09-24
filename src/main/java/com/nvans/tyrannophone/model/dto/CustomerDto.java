@@ -25,10 +25,6 @@ public class CustomerDto implements Serializable {
 
     public CustomerDto(User user) {
 
-        if (user == null || !(user.getDetails() instanceof Customer)) {
-            throw new IllegalArgumentException("Incorrect parameter 'User'");
-        }
-
         Customer customer = (Customer) user.getDetails();
 
         this.firstName = customer.getFirstName();
@@ -37,6 +33,15 @@ public class CustomerDto implements Serializable {
         this.address = customer.getAddress();
         this.passport = customer.getPassport();
 
+    }
+
+    public CustomerDto(Customer customer) {
+
+        this.firstName = customer.getFirstName();
+        this.lastName = customer.getLastName();
+        this.email = customer.getUser().getEmail();
+        this.address = customer.getAddress();
+        this.passport = customer.getPassport();
     }
 
     public String getFirstName() {

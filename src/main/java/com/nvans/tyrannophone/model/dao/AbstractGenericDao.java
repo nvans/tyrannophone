@@ -1,8 +1,12 @@
 package com.nvans.tyrannophone.model.dao;
 
+import com.nvans.tyrannophone.exception.ObjectCantBeSavedException;
+import org.hibernate.exception.ConstraintViolationException;
+
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import java.io.Serializable;
 import java.util.List;
 
@@ -36,7 +40,18 @@ public abstract class AbstractGenericDao<T extends Serializable> implements Gene
 
     @Override
     public void create(T entity) {
-        entityManager.persist(entity);
+
+        try {
+            entityManager.persist(entity);
+        }
+        catch (PersistenceException ex) {
+            if (ex.getCause() instanceof ConstraintViolationException) {
+                throw new ObjectCantBeSavedException(type.getSimpleName() + " with this parameters already exists.");
+            }
+            else {
+                throw ex;
+            }
+        }
     }
 
     @Override
@@ -83,5 +98,13 @@ public abstract class AbstractGenericDao<T extends Serializable> implements Gene
                         " o where o." + param + " = :obj", type)
                 .setParameter("obj", value)
                 .getResultList();
+    }
+
+    @Override
+    public long count() {
+
+        return entityManager
+                .createQuery("SELECT COUNT(o) FROM " + type.getSimpleName() + " o", Long.class)
+                .getSingleResult();
     }
 }

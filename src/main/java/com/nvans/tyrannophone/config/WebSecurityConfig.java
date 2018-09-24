@@ -22,9 +22,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService);
-
-        //auth.inMemoryAuthentication()
-        //        .withUser("admin").password(passwordEncoder().encode("admin")).roles("USER", "ADMIN");
     }
 
     @Bean
@@ -40,7 +37,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests().antMatchers("/*").permitAll()
                 .and()
-                .formLogin().loginPage("/login").permitAll()
+                .formLogin()
+                    .loginPage("/login").failureForwardUrl("/?error=true")
+                                        .successForwardUrl("/?success=true")
+                    .permitAll()
+                .and()
+                .logout().logoutSuccessUrl("/")
                 .and()
                 .csrf().disable();
 
