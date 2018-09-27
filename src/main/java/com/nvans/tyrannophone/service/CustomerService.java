@@ -1,11 +1,9 @@
 package com.nvans.tyrannophone.service;
 
 import com.nvans.tyrannophone.model.dto.CustomerDto;
-import com.nvans.tyrannophone.model.dto.CustomerFullDto;
-import com.nvans.tyrannophone.model.entity.Contract;
+import com.nvans.tyrannophone.model.entity.Customer;
 
 import java.util.List;
-import java.util.Set;
 
 public interface CustomerService {
 
@@ -14,19 +12,17 @@ public interface CustomerService {
      *
      * @return authenticated customer details, null - if current user hasn't "ROLE_CUSTOMER" returns
      */
-    CustomerDto getCustomerDetails();
-
-    // todo: move to contract service
-    Set<Contract> getContracts();
+    Customer getCustomerDetails();
 
 
-    CustomerFullDto getCustomerById(Long id);
+    Customer getCustomerById(Long id);
+
     /**
      * The method retrieves list of all customers.
      *
      * @return customers list
      */
-    List<CustomerFullDto> getAllCustomers();
+    List<Customer> getAllCustomers();
 
     /**
      * The method adds new customer to the system.
@@ -42,20 +38,20 @@ public interface CustomerService {
      *
      * @return Customer representation
      */
-    CustomerDto getCustomerByContractNumber(Long contractNumber);
+    Customer getCustomerByContractNumber(Long contractNumber);
+
+
+    Customer getCustomerByEmail(String email);
 
     /**
      * The method changes the customer state to inactive
      *
-     * @param email - the customer's email
+     * @param customer - the customer object
      */
-    void blockCustomer(String email);
+    void blockCustomer(Customer customer);
 
-    /**
-     * The method changes the customer state to active
-     *
-     * @param email - the customer's email
-     */
-    void unblockCustomer(String email);
 
+    void unblockCustomer(Customer customer);
+
+    void updateCustomer(Customer customer);
 }

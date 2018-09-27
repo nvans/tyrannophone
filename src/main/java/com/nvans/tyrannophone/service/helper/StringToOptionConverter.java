@@ -18,16 +18,20 @@ public class StringToOptionConverter implements Converter<String, Option> {
     @Override
     public Option convert(String s) {
 
-        Long id = null;
+        if (s == null || s.isEmpty()) {
+            return null;
+        }
 
         try {
-            id = Long.parseLong(s);
+            Long id = Long.parseLong(s);
             logger.debug("got id " + id);
+            return optionService.getOptionById(id);
         }
-        catch (Exception ex) {
-            logger.warn("can't convert", ex);
+        catch (NumberFormatException ex) {
+            logger.warn("can't convert to Long", ex);
         }
 
-        return id != null ? optionService.getOptionById(id) : null;
+        return optionService.getOptionByName(s);
+
     }
 }

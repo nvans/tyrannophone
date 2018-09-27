@@ -1,18 +1,13 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<%--<%@page isELIgnored="false" %>--%>
-
 <html>
 <head>
-    <%@include file="../templates/header.jsp"%>
+    <%@include file="templates/header.jsp"%>
 </head>
 <body>
-<%@include file="../templates/navigation.jsp"%>
-<%@include file="../templates/customer-navigation.jsp"%>
+<%@include file="templates/navigation.jsp"%>
+<%@include file="templates/customer-navigation.jsp"%>
+<%@include file="templates/employee-navigation.jsp"%>
 
-    <div class="row">
-        <div class="col-3"></div>
-        <div class="col-6">
+    <div class="container py-2">
         <table class="table table-striped table-hover">
             <thead>
             <tr>
@@ -25,7 +20,7 @@
             <tbody>
             <c:forEach items="${contracts}" var="contract">
                 <tr>
-                    <td><c:out value="${contract.contractNumber}"/> </td>
+                    <td><b><c:out value="${contract.contractNumber}"/></b></td>
                     <td><c:out value="${contract.plan.planName}"/> </td>
                     <td><c:out value="${contract.plan.monthlyPrice}"/> </td>
                     <td>
@@ -35,14 +30,12 @@
                     </td>
                     <td>
                         <a class="button btn-primary btn-sm" role="button"
-                           href="${pageContext.request.contextPath}/customer/contracts/${contract.contractNumber}">Edit</a>
+                           href="${pageContext.request.contextPath}/contracts/${contract.contractNumber}">Edit</a>
                     </td>
                 </tr>
             </c:forEach>
             </tbody>
         </table>
-        </div>
-        <div class="col-3"></div>
     </div>
 </body>
 </html>

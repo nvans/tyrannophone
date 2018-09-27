@@ -1,6 +1,8 @@
 package com.nvans.tyrannophone.config;
 
+import com.nvans.tyrannophone.service.helper.StringToCustomerConverter;
 import com.nvans.tyrannophone.service.helper.StringToOptionConverter;
+import com.nvans.tyrannophone.service.helper.StringToPlanConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -24,6 +26,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Autowired
     private StringToOptionConverter stringToOptionConverter;
+
+    @Autowired
+    private StringToCustomerConverter stringToCustomerConverter;
+
+    @Autowired
+    private StringToPlanConverter stringToPlanConverter;
 
     /**
      * Helps with mapping view names to JSP files
@@ -50,6 +58,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addFormatters(FormatterRegistry registry) {
+
         registry.addConverter(stringToOptionConverter);
+        registry.addConverter(stringToCustomerConverter);
+        registry.addConverter(stringToPlanConverter);
     }
+
+
 }

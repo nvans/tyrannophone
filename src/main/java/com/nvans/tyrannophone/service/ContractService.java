@@ -1,6 +1,5 @@
 package com.nvans.tyrannophone.service;
 
-import com.nvans.tyrannophone.model.dto.ContractDto;
 import com.nvans.tyrannophone.model.entity.Contract;
 
 import java.util.List;
@@ -16,7 +15,7 @@ public interface ContractService {
      * @param contractNumber - number of the contract.
      * @return single contract representation.
      */
-    ContractDto getContractByNumber(Long contractNumber);
+    Contract getContractByNumber(Long contractNumber);
 
 
     /**
@@ -42,4 +41,7 @@ public interface ContractService {
     void unblockContract(Long contractNumber);
 
 
+    void addContract(Contract contract);
+
+    void updateContract(Contract contract);
 }

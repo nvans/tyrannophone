@@ -18,7 +18,7 @@
             <tr>
                 <td>Option price</td>
                 <td><form:input path="price" /></td>
-                <td><form:errors path="price" cssClass="alert-danger" /></td>
+                <td><form:errors path="price" cssClass="alert-danger"/></td>
             </tr>
             <tr>
                 <td>Make active?</td>

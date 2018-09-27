@@ -1,6 +1,8 @@
 package com.nvans.tyrannophone.service.helper;
 
+import com.nvans.tyrannophone.model.dao.OptionDao;
 import com.nvans.tyrannophone.model.entity.Option;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,7 +12,8 @@ import java.util.*;
 @Transactional
 public class OptionsGraph {
 
-
+    @Autowired
+    OptionDao optionDao;
 
     public Map<Option, Set<Option>> getAdj(Set<Option> options) {
 
@@ -52,5 +55,23 @@ public class OptionsGraph {
         }
 
         return result;
+    }
+
+    @Transactional(readOnly = true)
+    public Set<Option> getAllParents(Option option) {
+
+        Option current = optionDao.findById(option.getId());
+
+        Set<Option> parents = new HashSet<>();
+
+        Option parent = current.getParentOption();
+
+        while (parent != null) {
+            parents.add(parent);
+            parent = parent.getParentOption();
+        }
+        parents.add(current);
+
+        return parents;
     }
 }

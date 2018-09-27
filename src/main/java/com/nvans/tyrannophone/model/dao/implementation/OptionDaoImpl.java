@@ -21,8 +21,23 @@ public class OptionDaoImpl extends AbstractGenericDao<Option> implements OptionD
                 "SELECT o FROM Option o " +
                 "LEFT JOIN FETCH o.childOptions " +
                 "LEFT JOIN FETCH o.parentOption " +
+                "LEFT JOIN FETCH o.incompatibleOptions " +
                 "WHERE o.id = :id", Option.class);
         query.setParameter("id", id);
+
+        return query.getSingleResult();
+    }
+
+    @Override
+    public Option findByIdEager(Long optionId) {
+
+        TypedQuery<Option> query = entityManager.createQuery(
+                "SELECT o FROM Option o " +
+                        "LEFT JOIN FETCH o.childOptions " +
+                        "LEFT JOIN FETCH o.parentOption " +
+                        "LEFT JOIN FETCH o.incompatibleOptions " +
+                        "WHERE o.id = :id", Option.class);
+        query.setParameter("id", optionId);
 
         return query.getSingleResult();
     }

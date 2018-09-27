@@ -22,7 +22,20 @@
             <td>${option.name}</td>
             <td>${option.price}</td>
             <td>${option.connectionAvailable}</td>
-            <td><a class="btn btn-primary" href="${pageContext.request.contextPath}/employee/options/editHierarchy/${option.id}">Edit</a></td>
+            <td>
+                <a class="btn btn-primary"
+                   href="${pageContext.request.contextPath}/employee/options/editHierarchy/${option.id}">
+                    Edit
+                </a>
+            </td>
+            <td>
+                <a class="btn btn-primary"
+                   href="${pageContext.request.contextPath}/employee/options/editCompatibility/${option.id}">
+                    Compatibilities
+                </a>
+            </td>
+
+
         </tr>
     </c:forEach>
     </tbody>

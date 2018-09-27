@@ -1,5 +1,7 @@
 package com.nvans.tyrannophone.model.entity;
 
+import com.nvans.tyrannophone.utils.validation.ContractNumber;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Set;
@@ -10,8 +12,10 @@ public class Contract implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+
     @Id
     @Column(name = "contract_number", length = 9)
+    @ContractNumber
     private Long contractNumber;
 
     @ManyToOne
@@ -27,7 +31,7 @@ public class Contract implements Serializable {
     @Column(name = "is_active", nullable = false)
     private boolean isActive;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL) //
     @JoinTable(name = "contract_option",
             joinColumns = @JoinColumn(name = "contract_number"),
             inverseJoinColumns = @JoinColumn(name = "option_id"))

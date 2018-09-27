@@ -1,6 +1,12 @@
 package com.nvans.tyrannophone.model.entity;
 
+import com.nvans.tyrannophone.utils.validation.PlanName;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.PositiveOrZero;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
@@ -16,18 +22,27 @@ public class Plan implements Serializable {
     @Column(name = "id")
     private Long id;
 
+    @NotNull
+    @Pattern(regexp = "^[A-Z][A-Za-z0-9+ ]+", message = "Incorrect plan name.")
+    @PlanName
     @Column(name = "plan_name", unique = true, nullable = false, updatable = false)
     private String planName;
 
+    @NotNull
+    @PositiveOrZero(message = "Plan price should be not negative")
     @Column(name = "connection_price", nullable = false)
     private Integer connectionPrice;
 
+    @NotNull
+    @PositiveOrZero(message = "Plan price should be not negative")
     @Column(name = "monthly_price", nullable = false, updatable = false)
     private Integer monthlyPrice;
 
     @Column(name = "is_connection_available", nullable = false)
-    private Boolean isConnectionAvailable;
+    private boolean isConnectionAvailable;
 
+    @NotEmpty(message = "Plan should have at least one available option")
+    @NotNull
     @ManyToMany
     @JoinTable(name = "plan_available_option",
             joinColumns = @JoinColumn(name = "plan_id",
@@ -74,11 +89,11 @@ public class Plan implements Serializable {
         this.monthlyPrice = monthlyPrice;
     }
 
-    public Boolean getConnectionAvailable() {
+    public boolean getConnectionAvailable() {
         return isConnectionAvailable;
     }
 
-    public void setConnectionAvailable(Boolean connectionAvailable) {
+    public void setConnectionAvailable(boolean connectionAvailable) {
         isConnectionAvailable = connectionAvailable;
     }
 
@@ -115,5 +130,10 @@ public class Plan implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(planName, connectionPrice, monthlyPrice, isConnectionAvailable);
+    }
+
+    @Override
+    public String toString() {
+        return planName;
     }
 }

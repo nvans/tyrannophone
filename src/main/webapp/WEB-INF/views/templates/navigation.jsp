@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-md navbar-light">
 
-    <a class="navbar-brand" href="#">Tyrannophone</a>
+    <a class="navbar-brand" href="/">Tyrannophone</a>
 
     <button class="navbar-toggler" type="button" data-toggle="collapse"
             data-target="#navbarContent">
@@ -35,7 +35,7 @@
                 </div>
                 <!-- body -->
                 <div class="modal-header">
-                    <form role="form" method="post" id="login-form" action="${pageContext.request.contextPath}/login">
+                    <form role="form" method="post" id="login-form" action="${pageContext.request.contextPath}/home">
                         <div class="form-group">
                             <input id="loguser" type="text" name="username" class="form-control" placeholder="Email or number" required/>
                             <input type="password" name="password" class="form-control" placeholder="Password" required/>

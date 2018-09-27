@@ -64,7 +64,9 @@ public class OptionServiceImpl implements OptionService {
     @Override
     public void addOption(Option option) {
 
-        optionDao.create(option);
+        option.setName(option.getName().trim());
+
+        optionDao.save(option);
     }
 
     @Override
@@ -108,5 +110,45 @@ public class OptionServiceImpl implements OptionService {
 
 
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Set<Option> getCandidatesToIncompatibility(Long optionId) {
+
+        Option optionPO = optionDao.findById(optionId);
+
+        Set<Option> candidates  = new HashSet<>(optionDao.findAll());
+
+        Set<Option> optionsToExclude = new HashSet<>();
+
+        optionsToExclude.addAll(optionsGraph.getAllParents(optionPO));
+        optionsToExclude.addAll(optionsGraph.getAllChildren(optionPO));
+        optionsToExclude.add(optionPO);
+
+        candidates.removeAll(optionsToExclude);
+
+        return candidates;
+    }
+
+    @Override
+    public void updateCompatibility(Option option) {
+
+        Set<Option> tmp = null;
+
+        for (Option opt : option.getIncompatibleOptions()) {
+            tmp = opt.getIncompatibleOptions();
+            tmp.add(option);
+            opt.setIncompatibleOptions(tmp);
+        }
+
+        optionDao.update(option);
+    }
+
+    @Override
+    public Option getOptionByName(String name) {
+
+        return optionDao.findByParam("name", name);
+    }
+
 
 }

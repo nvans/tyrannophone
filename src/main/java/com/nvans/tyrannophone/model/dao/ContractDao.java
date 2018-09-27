@@ -2,11 +2,11 @@ package com.nvans.tyrannophone.model.dao;
 
 import com.nvans.tyrannophone.model.entity.Contract;
 
-import java.util.Set;
+import java.util.List;
 
 public interface ContractDao extends GenericDao<Contract> {
 
-    Set<Contract> getAllByCustomerId(Long customerId);
+    List<Contract> getAllByCustomerId(Long customerId);
 
     Contract getContractByNumber(Long contractNumber);
 

@@ -1,8 +1,5 @@
 package com.nvans.tyrannophone.model.dao;
 
-import com.nvans.tyrannophone.exception.ObjectCantBeSavedException;
-import org.hibernate.exception.ConstraintViolationException;
-
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -39,18 +36,18 @@ public abstract class AbstractGenericDao<T extends Serializable> implements Gene
     }
 
     @Override
-    public void create(T entity) {
+    public void save(T entity) {
 
         try {
             entityManager.persist(entity);
         }
         catch (PersistenceException ex) {
-            if (ex.getCause() instanceof ConstraintViolationException) {
-                throw new ObjectCantBeSavedException(type.getSimpleName() + " with this parameters already exists.");
-            }
-            else {
+//            if (ex.getCause() instanceof ConstraintViolationException) {
+//                throw new ObjectCantBeSavedException(type.getSimpleName() + " with this parameters already exists.");
+//            }
+//            else {
                 throw ex;
-            }
+//            }
         }
     }
 

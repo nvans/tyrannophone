@@ -5,7 +5,6 @@ import com.nvans.tyrannophone.service.OptionValidationService;
 import com.nvans.tyrannophone.service.helper.CycleFinderService;
 import com.nvans.tyrannophone.service.helper.OptionsGraph;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +13,6 @@ import java.util.Set;
 
 @Service
 @Transactional
-@Secured({"ROLE_EMPLOYEE"})
 public class OptionValidationServiceImpl implements OptionValidationService {
 
     @Autowired
@@ -30,15 +28,26 @@ public class OptionValidationServiceImpl implements OptionValidationService {
 
         if (options == null) return false;
 
-        boolean b = !cycleFinderService.hasCycle(optionsGraph.getAdj(options));
-
-        return b;
+        return ! cycleFinderService.hasCycle(optionsGraph.getAdj(options));
     }
 
     @Override
-    public boolean isIncompatibleOptionsValid(Option option) {
+    public boolean isOptionsCompatible(Set<Option> options) {
 
-        return false;
+        for (Option optI : options) {
+            for (Option optJ : options) {
+
+                if (optI.equals(optJ)) {
+                    continue;
+                }
+
+                if(optI.getIncompatibleOptions().contains(optJ)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
 
@@ -69,5 +78,6 @@ public class OptionValidationServiceImpl implements OptionValidationService {
         return option1Hierarchy.contains(opt2) || option2Hierarchy.contains(opt1);
 
     }
+
 
 }

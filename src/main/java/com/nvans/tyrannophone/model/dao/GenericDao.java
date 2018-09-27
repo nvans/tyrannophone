@@ -10,7 +10,7 @@ public interface GenericDao<T extends Serializable> {
 
     List<T> findAll();
 
-    void create(T entity);
+    void save(T entity);
 
     void update(T entity);
 

@@ -10,8 +10,8 @@
 
         <div class="collapse navbar-collapse" id="navbarEmployee">
             <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/employee/customers">Customers</a></li>
-                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/employee/contracts">Contracts</a></li>
+                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customers">Customers</a></li>
+                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/contracts">Contracts</a></li>
                 <li class="nav-item">
                     <div class="dropdown">
                         <button class="btn btn-secondary dropdown-toggle nav-item"
@@ -20,8 +20,8 @@
                             Plans
                         </button>
                         <div class="dropdown-menu" aria-labelledby="plansMenu">
-                            <a class="dropdown-item" href="${pageContext.request.contextPath}/employee/plans">Show plans</a>
-                            <a class="dropdown-item" href="${pageContext.request.contextPath}/employee/plans/add">Add plan</a>
+                            <a class="dropdown-item" href="${pageContext.request.contextPath}/plans">Show plans</a>
+                            <a class="dropdown-item" href="${pageContext.request.contextPath}/plans/add">Add plan</a>
                         </div>
                     </div>
 
@@ -35,8 +35,8 @@
                             Options
                         </button>
                         <div class="dropdown-menu" aria-labelledby="optionsMenu">
-                            <a class="dropdown-item" href="${pageContext.request.contextPath}/employee/options">Show options</a>
-                            <a class="dropdown-item" href="${pageContext.request.contextPath}/employee/options/add">Add option</a>
+                            <a class="dropdown-item" href="${pageContext.request.contextPath}/options">Show options</a>
+                            <a class="dropdown-item" href="${pageContext.request.contextPath}/options/add">Add option</a>
                         </div>
                     </div>
                 </li>

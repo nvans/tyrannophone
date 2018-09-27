@@ -1,17 +1,20 @@
 package com.nvans.tyrannophone.service.implementation;
 
-import com.nvans.tyrannophone.exception.PlanAlreadyExistException;
 import com.nvans.tyrannophone.exception.PlanCantBeDeletedException;
-import com.nvans.tyrannophone.model.dao.GenericDao;
+import com.nvans.tyrannophone.model.dao.OptionDao;
+import com.nvans.tyrannophone.model.dao.PlanDao;
 import com.nvans.tyrannophone.model.entity.Contract;
 import com.nvans.tyrannophone.model.entity.Option;
 import com.nvans.tyrannophone.model.entity.Plan;
+import com.nvans.tyrannophone.service.OptionService;
 import com.nvans.tyrannophone.service.PlanService;
+import com.nvans.tyrannophone.service.helper.OptionsGraph;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -20,7 +23,16 @@ import java.util.Set;
 public class PlanServiceImpl implements PlanService {
 
     @Autowired
-    GenericDao<Plan> planDao;
+    PlanDao planDao;
+
+    @Autowired
+    OptionDao optionDao;
+
+    @Autowired
+    OptionService optionService;
+
+    @Autowired
+    OptionsGraph optionsGraph;
 
     @Override
     @Transactional(readOnly = true)
@@ -33,7 +45,7 @@ public class PlanServiceImpl implements PlanService {
     @Transactional(readOnly = true)
     public Plan getPlan(Long planId) {
 
-        return planDao.findById(planId);
+        return planDao.findByIdEager(planId);
     }
 
 
@@ -41,28 +53,39 @@ public class PlanServiceImpl implements PlanService {
     @Transactional(readOnly = true)
     public Plan getPlan(String planName) {
 
-        return planDao.findByParam("planName", planName);
+        return planDao.findByName(planName);
     }
 
     @Override
     @Secured({"ROLE_EMPLOYEE"})
-    public void addNewPlan(Plan plan) {
+    public void addPlan(Plan plan) {
 
-        if (planDao.count() != 0) {
+        Set<Option> availableOptions = new HashSet<>();
 
-            List<Plan> existedPlans = planDao.findAll();
-
-            for (Plan p : existedPlans) {
-
-                if(p.getPlanName().equals(plan.getPlanName())) {
-
-                    throw new PlanAlreadyExistException(
-                            "Plan with name " + plan.getPlanName() + " already exists.");
-                }
-            }
+        for(Option opt : plan.getAvailableOptions()) {
+            availableOptions.addAll(optionsGraph.getAllParents(opt));
         }
 
-        planDao.create(plan);
+        availableOptions.addAll(plan.getAvailableOptions());
+        plan.setAvailableOptions(availableOptions);
+
+        planDao.save(plan);
+    }
+
+    @Override
+    public void updatePlan(Plan plan) {
+
+        Plan planPO = planDao.findById(plan.getId());
+
+        Set<Option> availableOptions = new HashSet<>();
+
+        for(Option opt : plan.getAvailableOptions()) {
+            availableOptions.addAll(optionsGraph.getAllParents(opt));
+        }
+
+        availableOptions.addAll(plan.getAvailableOptions());
+
+        planPO.setAvailableOptions(availableOptions);
     }
 
     @Override

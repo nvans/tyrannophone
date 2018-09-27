@@ -23,11 +23,6 @@ public class DaoBeans {
     }
 
     @Bean
-    public GenericDao<Plan> planDao() {
-        return new GenericDaoImpl<>(Plan.class);
-    }
-
-    @Bean
     public GenericDao<Customer> customerDao() {
         return new GenericDaoImpl<>(Customer.class);
     }

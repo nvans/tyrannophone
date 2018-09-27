@@ -15,4 +15,10 @@ public interface OptionService {
     Option getOptionById(Long optionId);
 
     void editOptionHierarchy(Option option);
+
+    Set<Option> getCandidatesToIncompatibility(Long optionId);
+
+    void updateCompatibility(Option option);
+
+    Option getOptionByName(String name);
 }

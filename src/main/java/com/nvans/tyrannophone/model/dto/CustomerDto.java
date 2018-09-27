@@ -19,6 +19,12 @@ public class CustomerDto implements Serializable {
 
     private String passport = "Your passport number";
 
+    private String password = "Your password";
+
+    private String newPassword = "New password";
+
+    private String newPasswordConfirmation = "Confirm password";
+
     public CustomerDto() {
 
     }

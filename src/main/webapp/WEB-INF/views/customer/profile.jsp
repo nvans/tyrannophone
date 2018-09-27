@@ -4,62 +4,83 @@
     <title>Title</title>
 </head>
 <body>
-    <%@include file="../templates/navigation.jsp"%>
-    <%@include file="../templates/customer-navigation.jsp"%>
+<%@include file="../templates/navigation.jsp"%>
+<%@include file="../templates/customer-navigation.jsp"%>
 
-    <div class="container py-3">
-        <div class="row">
-            <div class="mx-auto col-sm-6">
-                <!-- form user info -->
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="mb-0">User Information</h4>
-                    </div>
-                    <div class="card-body">
-                        <form class="form" role="form" autocomplete="off">
-                            <div class="form-group row">
-                                <label class="col-lg-3 col-form-label form-control-label">First name</label>
-                                <div class="col-lg-9">
-                                    <input class="form-control" type="text" value="${customer.firstName}">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-lg-3 col-form-label form-control-label">Last name</label>
-                                <div class="col-lg-9">
-                                    <input class="form-control" type="text" value="${customer.lastName}">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-lg-3 col-form-label form-control-label">Email</label>
-                                <div class="col-lg-9">
-                                    <input class="form-control" type="email" value="${customer.email}">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-lg-3 col-form-label form-control-label">Passport</label>
-                                <div class="col-lg-9">
-                                    <input class="form-control" type="text" value="${customer.passport}">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-lg-3 col-form-label form-control-label">Address</label>
-                                <div class="col-lg-9">
-                                    <input class="form-control" type="url" value="${customer.address}">
-                                </div>
-                            </div>
+<sec:authorize access="hasRole('CUSTOMER')">
+    <div class="container py-2">
 
-                            <div class="form-group row">
-                                <label class="col-lg-3 col-form-label form-control-label"></label>
-                                <div class="col-lg-9">
-                                    <input type="button" class="btn btn-primary" value="Save Changes">
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+        <form:form method="post" action="${pageContext.request.contextPath}/customers/edit" modelAttribute="customer">
+            <%-- ID --%>
+            <div class="form-group row">
+                <label for="inputId" class="col-sm-2 col-form-label">Id</label>
+                <div class="col-sm-10">
+                    <form:input path="id" id="inputId" cssClass="form-control" readonly="true"/>
                 </div>
-                <!-- /form user info -->
+            </div>
+
+            <%--EMAIL--%>
+            <div class="form-group row">
+                <label for="inputEmail" class="col-sm-2 col-form-label">Email</label>
+                <div class="col-sm-10">
+                    <form:input path="user.email" id="inputEmail" cssClass="form-control" />
+                </div>
+            </div>
+
+            <%-- First Name--%>
+            <div class="form-group row">
+                <label for="inputFirstName" class="col-sm-2 col-form-label">First Name</label>
+                <div class="col-sm-10">
+                    <form:input path="firstName" cssClass="form-control" id="inputFirstName"/>
+                </div>
+            </div>
+
+            <%-- Last Name--%>
+            <div class="form-group row">
+                <label for="inputLastName" class="col-sm-2 col-form-label">Last Name</label>
+                <div class="col-sm-10">
+                    <form:input path="lastName"  cssClass="form-control" id="inputLastName" />
+                </div>
+            </div>
+
+            <%-- Passport --%>
+            <div class="form-group row">
+                <label for="inputPassport" class="col-sm-2 col-form-label">Passport</label>
+                <div class="col-sm-10">
+                    <form:input path="passport" cssClass="form-control" id="inputPassport"/>
+                </div>
+            </div>
+
+            <%-- Address --%>
+            <div class="form-group row">
+                <label for="inputAddress" class="col-sm-2 col-form-label">Address</label>
+                <div class="col-sm-10">
+                    <form:input path="address" class="form-control" id="inputAddress"/>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-sm-10 offset-sm-8">
+                    <input type="reset" class="btn btn-secondary col-sm-2"/>
+                    <input type="submit" class="btn btn-success col-sm-2"/>
+                </div>
+            </div>
+        </form:form>
+
+        <%-- Contracts --%>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Contracts</label>
+            <div class="col-sm-10">
+                <c:forEach items="${customer.contracts}" var="contract">
+                <span class="list-group-item">
+                    <a href="${pageContext.request.contextPath}/contracts/${contract.contractNumber}">
+                            ${contract.contractNumber}
+                    </a>
+                </span>
+                </c:forEach>
             </div>
         </div>
     </div>
+</sec:authorize>
 </body>
 </html>

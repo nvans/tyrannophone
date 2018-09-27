@@ -1,6 +1,5 @@
 package com.nvans.tyrannophone.web;
 
-import com.nvans.tyrannophone.model.dto.CustomerDto;
 import com.nvans.tyrannophone.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -19,7 +18,7 @@ public class TestController {
 
 //        customerService.blockCustomer("cust1@tmail.tm");
 //        customerService.unblockCustomer("cust1@tmail.tm");
-        CustomerDto customer = customerService.getCustomerByContractNumber(70002223344L);
+//        CustomerDto customer = customerService.getCustomerByContractNumber(70002223344L);
 
         return "test";
     }

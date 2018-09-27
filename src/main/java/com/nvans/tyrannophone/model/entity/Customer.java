@@ -2,6 +2,7 @@ package com.nvans.tyrannophone.model.entity;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -46,28 +47,19 @@ public class Customer extends Details {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
+        if (!(o instanceof Customer)) return false;
+        if (!super.equals(o)) return false;
         Customer customer = (Customer) o;
-
-        if(!getFirstName().equals(customer.getFirstName())) return false;
-        if(!getLastName().equals(customer.getLastName())) return false;
-        if(!getPassport().equals(customer.getPassport())) return false;
-        if(!getAddress().equals(customer.getAddress())) return false;
-        if(!getUser().equals(customer.getUser())) return false;
-        if (!balance.equals(customer.balance)) return false;
-        return contracts != null ? contracts.equals(customer.contracts) : customer.contracts == null;
+        return Objects.equals(balance, customer.balance);
     }
 
     @Override
     public int hashCode() {
-        int result = getFirstName().hashCode();
-        result = 31 * result + getLastName().hashCode();
-        result = 31 * result + getPassport().hashCode();
-        result = 31 * result + getAddress().hashCode();
-        result = 31 * result + getUser().hashCode();
-        result = 31 * result + balance.hashCode();
-        result = 31 * result + (contracts != null ? contracts.hashCode() : 0);
-        return result;
+        return Objects.hash(super.hashCode(), balance);
+    }
+
+    @Override
+    public String toString() {
+        return this.getUser().getEmail();
     }
 }

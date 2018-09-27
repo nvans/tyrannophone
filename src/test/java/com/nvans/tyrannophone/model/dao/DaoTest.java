@@ -16,7 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @ContextConfiguration(classes = com.nvans.tyrannophone.config.JPAConfig.class)
@@ -52,6 +51,10 @@ public class DaoTest {
     @Transactional
     public void testFindUserByID() {
 
+
+
+        String pass = encoder.encode("pass");
+
         createRoles();
         createPlans();
 
@@ -67,7 +70,7 @@ public class DaoTest {
         adminUser.setRoles(roles);
         adminUser.setActive(true);
 
-        userDao.create(adminUser);
+        userDao.save(adminUser);
 
         User custUsr = new User();
         custUsr.setUserName("cust1");
@@ -78,7 +81,7 @@ public class DaoTest {
         custUsr.setRoles(custRoles);
         custUsr.setActive(true);
 
-        userDao.create(custUsr);
+        userDao.save(custUsr);
 
         Employee employee = new Employee();
         employee.setUser(adminUser);
@@ -88,7 +91,7 @@ public class DaoTest {
         employee.setPassport("12343");
         employee.setPosition("employee");
 
-        detailsDao.create(employee);
+        detailsDao.save(employee);
 
 
         Customer customer = new Customer();
@@ -99,7 +102,7 @@ public class DaoTest {
         customer.setPassport("123456");
         customer.setBalance(0);
 
-        detailsDao.create(customer);
+        detailsDao.save(customer);
 
         User cust1 = userDao.findByParam("userName", "cust1");
         User adm = userDao.findByParam("email", "admin1@tyrannophone.com");
@@ -125,9 +128,9 @@ public class DaoTest {
         Role employeeRole = new Role();
         employeeRole.setRole("ROLE_EMPLOYEE");
 
-        roleDao.create(adminRole);
-        roleDao.create(customerRole);
-        roleDao.create(employeeRole);
+        roleDao.save(adminRole);
+        roleDao.save(customerRole);
+        roleDao.save(employeeRole);
     }
 
     private void createPlans() {
@@ -144,7 +147,7 @@ public class DaoTest {
             plan.setMonthlyPrice(initPrice);
             plan.setConnectionAvailable(true);
 
-            planDao.create(plan);
+            planDao.save(plan);
 
             initPrice -= 200;
         }
@@ -162,7 +165,7 @@ public class DaoTest {
 //            contract1.setPlan(plan);
 //            contract1.setActive(false);
 //
-//            contractDao.create(contract1);
+//            contractDao.save(contract1);
 //        }
 //
 //    }

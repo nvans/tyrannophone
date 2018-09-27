@@ -33,21 +33,31 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests().antMatchers("/admin**").hasRole("ADMIN")
                 .and()
-                .authorizeRequests().antMatchers("/customer**").hasRole("CUSTOMER")
+                .authorizeRequests().antMatchers("/contracts/**").hasAnyRole("CUSTOMER", "EMPLOYEE")
+                .and()
+                .authorizeRequests().antMatchers("/contracts/add").hasRole("EMPLOYEE")
+                .and()
+                .authorizeRequests().antMatchers("/options/**").hasRole("EMPLOYEE")
+                .and()
+                .authorizeRequests().antMatchers("/plans/**").hasRole("EMPLOYEE")
+                .and()
+                .authorizeRequests().antMatchers("/options/**").hasRole("EMPLOYEE")
+                .and()
+                .authorizeRequests().antMatchers("/customers/**").hasRole("EMPLOYEE")
                 .and()
                 .authorizeRequests().antMatchers("/*").permitAll()
                 .and()
                 .formLogin()
-                    .loginPage("/login").failureForwardUrl("/?error=true")
-                                        .successForwardUrl("/?success=true")
+                    .loginPage("/home").failureForwardUrl("/home/?error=true")
+                                        .successForwardUrl("/home?success=true")
                     .permitAll()
                 .and()
                 .logout().logoutSuccessUrl("/")
                 .and()
+                .exceptionHandling().accessDeniedPage("/403")
+                .and()
                 .csrf().disable();
 
-//
-//        http.authorizeRequests().antMatchers("/**").permitAll().and().formLogin().loginPage("/").permitAll().and().csrf().disable();
     }
 
 

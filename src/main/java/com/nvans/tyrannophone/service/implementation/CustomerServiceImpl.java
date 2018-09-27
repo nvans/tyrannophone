@@ -4,10 +4,7 @@ import com.nvans.tyrannophone.model.dao.ContractDao;
 import com.nvans.tyrannophone.model.dao.CustomerDao;
 import com.nvans.tyrannophone.model.dao.GenericDao;
 import com.nvans.tyrannophone.model.dto.CustomerDto;
-import com.nvans.tyrannophone.model.dto.CustomerFullDto;
-import com.nvans.tyrannophone.model.entity.Contract;
 import com.nvans.tyrannophone.model.entity.Customer;
-import com.nvans.tyrannophone.model.entity.Role;
 import com.nvans.tyrannophone.model.entity.User;
 import com.nvans.tyrannophone.model.security.CustomUserPrinciple;
 import com.nvans.tyrannophone.service.CustomerService;
@@ -18,8 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -32,57 +27,32 @@ public class CustomerServiceImpl implements CustomerService {
     private GenericDao<User> userDao;
 
     @Autowired
-    private GenericDao<Role> roleDao;
-
-    @Autowired
     private CustomerDao customerDao;
 
     @Override
     @Transactional(readOnly = true)
-    public CustomerDto getCustomerDetails() {
+    public Customer getCustomerDetails() {
 
         CustomUserPrinciple currentUser =
                 (CustomUserPrinciple) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        User user = userDao.findById(currentUser.getUserId());
-
-        if (user != null && user.getDetails() != null && user.getDetails() instanceof Customer) {
-            return new CustomerDto(user);
-        }
-
-        return null;
+        return customerDao.findById(currentUser.getUserId());
     }
+
 
     @Override
     @Transactional(readOnly = true)
-    public Set<Contract> getContracts() {
+    public Customer getCustomerById(Long id) {
 
-        CustomUserPrinciple currentUser =
-                (CustomUserPrinciple) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        return contractDao.getAllByCustomerId(currentUser.getUserId());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public CustomerFullDto getCustomerById(Long id) {
-
-        Customer customer = customerDao.findById(id);
-
-        return new CustomerFullDto(customer);
-
+        return customerDao.findById(id);
     }
 
     @Override
     @Secured({"ROLE_EMPLOYEE"})
     @Transactional(readOnly = true)
-    public List<CustomerFullDto> getAllCustomers() {
+    public List<Customer> getAllCustomers() {
 
-        List<Customer> customers = customerDao.findAll();
-
-        return customers.stream()
-                .map(CustomerFullDto::new)
-                .collect(Collectors.toList());
+        return customerDao.findAll();
     }
 
     @Override
@@ -95,30 +65,47 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @Secured({"ROLE_EMPLOYEE"})
     @Transactional(readOnly = true)
-    public CustomerDto getCustomerByContractNumber(Long contractNumber) {
+    public Customer getCustomerByContractNumber(Long contractNumber) {
 
-        return new CustomerDto(customerDao.getByContractNumber(contractNumber));
+        return customerDao.getByContractNumber(contractNumber);
     }
 
     @Override
     @Secured({"ROLE_EMPLOYEE"})
-    public void blockCustomer(String email) {
+    @Transactional(readOnly = true)
+    public Customer getCustomerByEmail(String email) {
 
-        Customer customer = customerDao.getCustomerByEmail(email);
+        return customerDao.getCustomerByEmail(email);
+    }
+
+    @Override
+    @Secured({"ROLE_EMPLOYEE"})
+    public void blockCustomer(Customer customer) {
 
         if (customer != null) {
             customer.getUser().setActive(false);
         }
 
+        customerDao.update(customer);
+
     }
 
     @Override
     @Secured({"ROLE_EMPLOYEE"})
-    public void unblockCustomer(String email) {
-        Customer customer = customerDao.getCustomerByEmail(email);
+    public void unblockCustomer(Customer customer) {
 
         if (customer != null) {
             customer.getUser().setActive(true);
+        }
+
+        customerDao.update(customer);
+    }
+
+    @Override
+    public void updateCustomer(Customer customer) {
+
+        if (customer != null) {
+            customerDao.update(customer);
         }
     }
 }

@@ -2,6 +2,7 @@ package com.nvans.tyrannophone.model.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
@@ -27,7 +28,7 @@ public abstract class Details implements Serializable {
 
 
     @MapsId
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "id")
     private User user;
 
@@ -83,4 +84,21 @@ public abstract class Details implements Serializable {
 
     // <-- Getters and Setters
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Details)) return false;
+        Details details = (Details) o;
+        return Objects.equals(firstName, details.firstName) &&
+                Objects.equals(lastName, details.lastName) &&
+                Objects.equals(passport, details.passport) &&
+                Objects.equals(address, details.address) &&
+                Objects.equals(user, details.user);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(firstName, lastName, passport, address, user);
+    }
 }

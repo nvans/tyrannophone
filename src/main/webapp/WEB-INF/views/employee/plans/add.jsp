@@ -1,16 +1,43 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: ivan
-  Date: 24.09.18
-  Time: 0:21
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Title</title>
+    <title>Create new plan</title>
+    <%@include file="../../templates/header.jsp"%>
 </head>
 <body>
+    <%@include file="../../templates/navigation.jsp"%>
+    <%@include file="../../templates/employee-navigation.jsp"%>
 
+    <form:form method="post" action="/employee/plans/add" modelAttribute="plan">
+        <table>
+            <tr>
+                <td>Plan name</td>
+                <td><form:input path="planName" /></td>
+                <td><form:errors path="planName" cssClass="alert-danger"/> </td>
+            </tr>
+            <tr>
+                <td>Connection price</td>
+                <td><form:input path="connectionPrice" /></td>
+                <td><form:errors path="connectionPrice" cssClass="alert-danger" /></td>
+            </tr>
+            <tr>
+                <td>Monthly price</td>
+                <td><form:input path="monthlyPrice" /></td>
+                <td><form:errors path="monthlyPrice" cssClass="alert-danger" /></td>
+            </tr>
+                <td>Available options</td>
+                <td>
+                    <form:select path="availableOptions" multiple="true">
+                        <form:options items="${options}" itemValue="id" itemLabel="name"/>
+                    </form:select>
+                </td>
+                <td><form:errors path="availableOptions" cssClass="alert-danger" /></td>
+            <tr>
+                <td>Make active?</td>
+                <td><form:checkbox path="connectionAvailable" /></td>
+            </tr>
+        </table>
+        <form:button name="Add">Add plan</form:button>
+    </form:form>
 </body>
 </html>

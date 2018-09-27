@@ -6,13 +6,16 @@
 <body>
 <%@include file="../../templates/navigation.jsp"%>
 <%@include file="../../templates/employee-navigation.jsp"%>
+
+
 <div class="container py-2">
-    <form>
+
+    <form:form method="post" action="${pageContext.request.contextPath}/employee/customers/edit" modelAttribute="customer">
         <%-- ID --%>
         <div class="form-group row">
             <label for="inputId" class="col-sm-2 col-form-label">Id</label>
             <div class="col-sm-10">
-                <input type="email" class="form-control" id="inputId" value="${customer.id}" readonly>
+                <form:input path="id" id="inputId" cssClass="form-control" readonly="true"/>
             </div>
         </div>
 
@@ -20,7 +23,7 @@
         <div class="form-group row">
             <label for="inputEmail" class="col-sm-2 col-form-label">Email</label>
             <div class="col-sm-10">
-                <input type="email" class="form-control" id="inputEmail" value="${customer.email}">
+                <form:input path="user.email" id="inputEmail" cssClass="form-control" />
             </div>
         </div>
 
@@ -28,7 +31,7 @@
         <div class="form-group row">
             <label for="inputFirstName" class="col-sm-2 col-form-label">First Name</label>
             <div class="col-sm-10">
-                <input type="email" class="form-control" id="inputFirstName" value="${customer.firstName}">
+                <form:input path="firstName" cssClass="form-control" id="inputFirstName"/>
             </div>
         </div>
 
@@ -36,7 +39,7 @@
         <div class="form-group row">
             <label for="inputLastName" class="col-sm-2 col-form-label">Last Name</label>
             <div class="col-sm-10">
-                <input type="email" class="form-control" id="inputLastName" value="${customer.lastName}">
+                <form:input path="lastName"  cssClass="form-control" id="inputLastName" />
             </div>
         </div>
 
@@ -44,7 +47,7 @@
         <div class="form-group row">
             <label for="inputPassport" class="col-sm-2 col-form-label">Passport</label>
             <div class="col-sm-10">
-                <input type="email" class="form-control" id="inputPassport" value="${customer.passport}">
+                <form:input path="passport" cssClass="form-control" id="inputPassport"/>
             </div>
         </div>
 
@@ -52,30 +55,86 @@
         <div class="form-group row">
             <label for="inputAddress" class="col-sm-2 col-form-label">Address</label>
             <div class="col-sm-10">
-                <input type="email" class="form-control" id="inputAddress" value="${customer.address}">
+                <form:input path="address" class="form-control" id="inputAddress"/>
             </div>
         </div>
 
-        <%-- Contracts --%>
-        <c:forEach items="${customer.contracts}" var="contract">
-            <%--<div class="form-group row">--%>
-                <%--<label class="col-sm-2 col-form-label">Last Name</label>--%>
-                <%--<div class="col-sm-10">--%>
-                    <%--<input type="email" class="form-control" value="${contract.contractNumber}">--%>
-                <%--</div>--%>
-            <%--</div>--%>
-            <label class="col-sm-2 col-form-label">Contracts</label>
-            <ul>
-                <li>${contract.contractNumber}</li>
-            </ul>
-        </c:forEach>
-
-            <div class="form-group row">
-            <div class="col-sm-10 offset-sm-2">
-                <button type="submit" class="btn btn-primary">Sign in</button>
+        <div class="form-group row">
+            <div class="col-sm-10 offset-sm-8">
+                <input type="reset" class="btn btn-secondary col-sm-2"/>
+                <input type="submit" class="btn btn-success col-sm-2"/>
             </div>
         </div>
-    </form>
+
+        <div class="form-group row">
+            <c:if test="${customer.user.active}">
+                <button class="btn btn-danger col-sm-2" data-target="#block-modal" data-toggle="modal">Block</button>
+                <%-- Modal form block details --%>
+                <div class="modal fade" id="block-modal">
+                    <div class="modal-dialog modal-dialog-centered modal-sm">
+                        <div class="modal-content">
+                            <!-- header -->
+                            <div class="modal-header">
+                                <h3 class="modal-title">Block details</h3>
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            </div>
+                            <!-- body -->
+                            <div class="modal-header">
+                                <form role="form" method="post" id="block-form" action="${pageContext.request.contextPath}/employee/customers/block">
+                                    <div class="form-group">
+                                        <input type="hidden" name="customer" value="${customer}">
+                                        <label for="reason">Block reason</label>
+                                        <textarea class="form-control" name="reason" id="reason" rows="3"></textarea>
+                                    </div>
+                                </form>
+                            </div>
+                            <!-- footer -->
+                            <div class="modal-footer">
+                                <button name="submit" type="submit" class="btn btn-danger btn-block" form="block-form">Block</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    $('.modal').on('shown.bs.modal', function() {
+                        $(this).find('#reason').focus();
+                    });
+                </script>
+            </c:if>
+
+            <c:if test="${!customer.user.active}">
+                <form role="form" method="post" id="unblock-form" action="${pageContext.request.contextPath}/employee/customers/unblock">
+                    <div class="form-group">
+                        <input type="hidden" name="contractNumber" value="${customer}">
+                        <button type="submit" class="btn btn-danger col-sm-2">Unblock</button>
+                    </div>
+                </form>
+            </c:if>
+        </div>
+    </form:form>
+
+    <%-- Contracts --%>
+    <div class="form-group row">
+        <label class="col-sm-2 col-form-label">Contracts</label>
+        <div class="col-sm-10">
+            <c:forEach items="${customer.contracts}" var="contract">
+                <span class="list-group-item">
+                    <a href="${pageContext.request.contextPath}/employee/contracts/${contract.contractNumber}">
+                            ${contract.contractNumber}
+                    </a>
+                </span>
+            </c:forEach>
+            <span class="list-group-item">
+                <a class="btn btn-primary btn-sm" role="button" href="/employee/contracts/add/${customer.id}">Add contract</a>
+            </span>
+        </div>
+    </div>
+
+
+
+
+
+
 </div>
 
 </body>

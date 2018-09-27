@@ -38,7 +38,9 @@ public interface PlanService {
      *
      * @param plan - plan object
      */
-    void addNewPlan(Plan plan);
+    void addPlan(Plan plan);
+
+    void updatePlan(Plan plan);
 
     /**
      * The method deletes an existed plan from the system by id.

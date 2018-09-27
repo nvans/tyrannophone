@@ -2,9 +2,12 @@ package com.nvans.tyrannophone.model.dto;
 
 import com.nvans.tyrannophone.model.entity.BlockDetails;
 import com.nvans.tyrannophone.model.entity.Contract;
+import com.nvans.tyrannophone.model.entity.Option;
 import com.nvans.tyrannophone.model.entity.Plan;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ContractDto implements Serializable {
 
@@ -17,6 +20,10 @@ public class ContractDto implements Serializable {
     private boolean isActive;
 
     private boolean isReadOnly;
+
+    private Set<Option> compatibleOptions;
+
+    private Set<Option> incompatibleOptions;
 
     private BlockDetails blockDetails;
 
@@ -32,6 +39,29 @@ public class ContractDto implements Serializable {
         this.isActive = contract.isActive();
         this.isReadOnly = readOnly;
         this.blockDetails = contract.getBlockDetails();
+
+        this.compatibleOptions = new HashSet<>();
+        this.incompatibleOptions = new HashSet<>();
+
+        for (Option optI : contract.getPlan().getAvailableOptions()) {
+            for (Option optJ : contract.getPlan().getAvailableOptions()) {
+                if (optI.equals(optJ)) {
+                    continue;
+                }
+
+                if (optI.getIncompatibleOptions().contains(optJ)) {
+                    incompatibleOptions.add(optJ);
+                }
+                else {
+                    if (incompatibleOptions.contains(optJ)) {
+                        continue;
+                    }
+
+                    compatibleOptions.add(optJ);
+                }
+            }
+        }
+
     }
 
     public Long getContractNumber() {
@@ -64,6 +94,22 @@ public class ContractDto implements Serializable {
 
     public void setReadOnly(boolean readOnly) {
         isReadOnly = readOnly;
+    }
+
+    public Set<Option> getCompatibleOptions() {
+        return compatibleOptions;
+    }
+
+    public void setCompatibleOptions(Set<Option> compatibleOptions) {
+        this.compatibleOptions = compatibleOptions;
+    }
+
+    public Set<Option> getIncompatibleOptions() {
+        return incompatibleOptions;
+    }
+
+    public void setIncompatibleOptions(Set<Option> incompatibleOptions) {
+        this.incompatibleOptions = incompatibleOptions;
     }
 
     public BlockDetails getBlockDetails() {

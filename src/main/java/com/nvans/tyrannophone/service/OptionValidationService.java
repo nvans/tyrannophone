@@ -18,11 +18,12 @@ public interface OptionValidationService {
     /**
      * The method validates incompatible options set for the one option.
      *
-     * @param option - option.
+     * @param options - options set.
      *
-     * @return true if set of incompatible options is valid, false otherwise.
+     * @return true if the set of options is valid, false otherwise.
      */
-    boolean isIncompatibleOptionsValid(Option option);
+    boolean isOptionsCompatible(Set<Option> options);
 
     boolean haveParentChildRelation(Option opt1, Option opt2);
+
 }

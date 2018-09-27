@@ -19,7 +19,7 @@ public class Option implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Pattern(regexp = "^\\w[A-Za-z0-9()+ ]{3,}", message = "Invalid option name.")
+    @Pattern(regexp = "^[A-Z][A-Za-z0-9()+ ]{2,}", message = "Invalid option name.")
     @Column(name = "name", nullable = false, unique = true, updatable = false)
     private String name;
 
@@ -30,7 +30,7 @@ public class Option implements Serializable {
     @Column(name = "is_available")
     private boolean isConnectionAvailable;
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.PERSIST})
     @JoinTable(name = "option_incompatible_option",
         joinColumns = @JoinColumn(name = "option_id", referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name = "inc_option_id", referencedColumnName = "id"))
@@ -38,11 +38,11 @@ public class Option implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinTable(name = "option_dependencies",
-            joinColumns = @JoinColumn(name = "parent_option_id"),
-            inverseJoinColumns = @JoinColumn(name = "option_id"))
+            joinColumns = @JoinColumn(name = "option_id"),
+            inverseJoinColumns = @JoinColumn(name = "parent_option_id"))
     private Option parentOption;
 
-    @OneToMany(mappedBy = "parentOption")
+    @OneToMany(mappedBy = "parentOption", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<Option> childOptions = new HashSet<>();
 
     // Getters and Setters -->
