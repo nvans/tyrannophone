@@ -1,9 +1,13 @@
 package com.nvans.tyrannophone.web;
 
+import com.nvans.tyrannophone.model.dto.CustomerDto;
 import com.nvans.tyrannophone.model.entity.Customer;
+import com.nvans.tyrannophone.model.security.CustomUserPrinciple;
 import com.nvans.tyrannophone.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -11,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +26,10 @@ import java.util.List;
 public class CustomersController {
 
     @Autowired
-    CustomerService customerService;
+    private CustomerService customerService;
+
+    @Autowired
+    private SessionRegistry sessionRegistry;
 
     @GetMapping
     public String showCustomers(Model model) {
@@ -65,7 +73,7 @@ public class CustomersController {
     }
 
     @PostMapping("/edit")
-    public String editCustomer(@Valid @ModelAttribute Customer customer, BindingResult result) {
+    public String editCustomer(@Valid @ModelAttribute CustomerDto customer, BindingResult result) {
 
         if (result.hasErrors()) {
             // todo
@@ -74,23 +82,23 @@ public class CustomersController {
 
         customerService.updateCustomer(customer);
 
-        return "customers/edit";
+        return "redirect:/customers/" + customer.getCustomerId();
     }
 
-    @PostMapping("/block")
-    public String blockCustomer(@ModelAttribute Customer customer) {
+    @PostMapping("/block/{customerId}")
+    public String blockCustomer(@PathVariable Long customerId, @RequestParam String reason) {
 
-        customerService.blockCustomer(customer);
+        customerService.blockCustomer(customerId, reason);
 
-        return "redirect:/customers/" + customer.getId();
+        return "redirect:/customers/" + customerId;
     }
 
-    @PostMapping("/unblock")
-    public String unblockCustomer(@ModelAttribute Customer customer) {
+    @PostMapping("/unblock/{customerId}")
+    public String unblockCustomer(@PathVariable Long customerId) {
 
-        customerService.unblockCustomer(customer);
+        customerService.unblockCustomer(customerId);
 
-        return "redirect:/customers/" + customer.getId();
+        return "redirect:/customers/" + customerId;
     }
 
 }
