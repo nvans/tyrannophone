@@ -11,7 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Set;
+import java.util.List;
 
 @Controller
 @RequestMapping("/options")
@@ -51,11 +51,31 @@ public class OptionController {
         return "redirect:/options";
     }
 
-    @GetMapping("/editHierarchy/{optionId}")
+    @GetMapping("/{optionId}")
+    public String editOption(@PathVariable Long optionId, Model model) {
+
+        model.addAttribute("option", optionService.getOptionById(optionId));
+
+        return "options/edit";
+    }
+
+    @PostMapping("/edit")
+    public String editOption(@ModelAttribute Option option, BindingResult result) {
+
+        if (result.hasErrors()) {
+            return "options/edit";
+        }
+
+        optionService.updateOption(option);
+
+        return "redirect:/options/" + option.getId();
+    }
+
+    @GetMapping("/{optionId}/editHierarchy")
     public String editOptionHierarchy(@PathVariable Long optionId, Model model) {
 
         Option currentOption = optionService.getOptionById(optionId);
-        Set<Option> allOptions = optionService.getAllOptions();
+        List<Option> allOptions = optionService.getAllOptions();
         allOptions.remove(currentOption);
 
         model.addAttribute("option", currentOption);
@@ -64,29 +84,30 @@ public class OptionController {
         return "options/editHierarchy";
     }
 
-    @PostMapping("/editHierarchy")
+    @PostMapping("/{optionId}/editHierarchy")
     public String editOptionHierarchy(@ModelAttribute Option option) {
 
         optionService.editOptionHierarchy(option);
 
-        return "redirect:/options";
+        return "redirect:/options/" + option.getId();
     }
 
-    @GetMapping("/editCompatibility/{optionId}")
+    @GetMapping("/{optionId}/editCompatibility")
     public String editCompatibility(@PathVariable Long optionId, Model model) {
 
+
         model.addAttribute("option", optionService.getOptionById(optionId));
-        model.addAttribute("options", optionService.getCandidatesToIncompatibility(optionId));
+        model.addAttribute("options", optionService.getAllowableIncompatibleOptionsSet(optionId));
 
         return "options/editCompatibility";
     }
 
-    @PostMapping("/editCompatibility")
-    public String editCompatibility(@ModelAttribute Option option, BindingResult result) {
+    @PostMapping("/{optionId}/editCompatibility")
+    public String editCompatibility(@ModelAttribute Option option) {
 
         optionService.updateCompatibility(option);
 
-        return "options/editCompatibility";
+        return "redirect:/options/" + option.getId();
     }
 
 }

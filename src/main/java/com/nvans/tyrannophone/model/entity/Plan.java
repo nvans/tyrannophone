@@ -1,17 +1,20 @@
 package com.nvans.tyrannophone.model.entity;
 
 import com.nvans.tyrannophone.utils.validation.PlanName;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.PositiveOrZero;
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
+@Cacheable(value = false)
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Table(name = "plan")
 public class Plan implements Serializable {
 
@@ -41,17 +44,26 @@ public class Plan implements Serializable {
     @Column(name = "is_connection_available", nullable = false)
     private boolean isConnectionAvailable;
 
-    @NotEmpty(message = "Plan should have at least one available option")
-    @NotNull
-    @ManyToMany
-    @JoinTable(name = "plan_available_option",
-            joinColumns = @JoinColumn(name = "plan_id",
-                    referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "option_id",
-                    referencedColumnName = "id"))
-    private Set<Option> availableOptions;
+    @Column(name ="description", length = 55)
+    private String description;
 
-    @OneToMany(mappedBy = "plan")
+//    @NotNull
+//    @ManyToMany(fetch = FetchType.LAZY)
+//    @JoinTable(name = "plan_available_option",
+//            joinColumns = @JoinColumn(name = "plan_id",
+//                    referencedColumnName = "id"),
+//            inverseJoinColumns = @JoinColumn(name = "option_id",
+//                    referencedColumnName = "id"))
+//    private Set<Option> availableOptions;
+
+//    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "plan_available_option")
+    @MapKeyJoinColumn(name = "option_id")
+    @Column(name = "is_connected")
+    private Map<Option, Boolean> availableOptions;
+
+    @OneToMany(mappedBy = "plan", fetch = FetchType.LAZY)
     private Set<Contract> contracts;
 
 
@@ -97,13 +109,39 @@ public class Plan implements Serializable {
         isConnectionAvailable = connectionAvailable;
     }
 
-    public Set<Option> getAvailableOptions() {
+//    public Set<Option> getAvailableOptions() {
+//        return availableOptions;
+//    }
+//
+//    public void setAvailableOptions(Set<Option> availableOptions) {
+//        this.availableOptions = availableOptions;
+//    }
+
+
+    public boolean isConnectionAvailable() {
+        return isConnectionAvailable;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+
+    public Map<Option, Boolean> getAvailableOptions() {
         return availableOptions;
     }
 
-    public void setAvailableOptions(Set<Option> availableOptions) {
+    public void setAvailableOptions(Map<Option, Boolean> availableOptions) {
         this.availableOptions = availableOptions;
     }
+
+//    public Set<Option> getAvailableOptions() {
+//        return availableOptions.keySet();
+//    }
 
     public Set<Contract> getContracts() {
         return contracts;
@@ -121,7 +159,7 @@ public class Plan implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Plan plan = (Plan) o;
-        return Objects.equals(planName, plan.planName) &&
+        return  Objects.equals(planName, plan.planName) &&
                 Objects.equals(connectionPrice, plan.connectionPrice) &&
                 Objects.equals(monthlyPrice, plan.monthlyPrice) &&
                 Objects.equals(isConnectionAvailable, plan.isConnectionAvailable);

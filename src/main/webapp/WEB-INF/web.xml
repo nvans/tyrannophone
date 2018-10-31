@@ -4,4 +4,9 @@
 
 <web-app>
     <display-name>Tyrannophone</display-name>
+
+    <error-page>
+        <error-code>404</error-code>
+        <location>/404</location>
+    </error-page>
 </web-app>

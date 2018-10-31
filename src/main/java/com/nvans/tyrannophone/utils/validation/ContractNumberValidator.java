@@ -16,6 +16,6 @@ public class ContractNumberValidator implements ConstraintValidator<ContractNumb
 
         if (number == null) return false;
 
-        return Pattern.matches("7000\\d{5}", number.toString());
+        return Pattern.matches("7000\\d{7}", number.toString());
     }
 }

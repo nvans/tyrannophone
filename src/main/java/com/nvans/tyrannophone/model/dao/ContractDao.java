@@ -12,4 +12,6 @@ public interface ContractDao extends GenericDao<Contract> {
 
     Contract getContractByNumberAndCustomerId(Long contractNumber, Long customerId);
 
+    List<Contract> getContractPage(int pageNumber, int pageSize);
+
 }

@@ -1,7 +1,6 @@
 package com.nvans.tyrannophone.model.dao;
 
 import com.nvans.tyrannophone.model.entity.BlockDetails;
-import com.nvans.tyrannophone.model.entity.Role;
 import com.nvans.tyrannophone.model.entity.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,8 +9,6 @@ import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Set;
 
 @ContextConfiguration(classes = com.nvans.tyrannophone.config.JPAConfig.class)
 @RunWith(SpringJUnit4ClassRunner.class)

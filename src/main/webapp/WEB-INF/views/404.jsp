@@ -1,16 +1,21 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: withb
-  Date: 30.10.2018
-  Time: 3:56
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>$Title$</title>
+    <title>Not found</title>
+    <%@include file="templates/header.jsp"%>
 </head>
 <body>
-$END$
+<%@include file="templates/navigation.jsp" %>
+<%@include file="templates/customer-navigation.jsp" %>
+<%@include file="templates/employee-navigation.jsp" %>
+
+<div class="jumbotron">
+    <h1 class="display-3">Not found!</h1>
+    <br/><br/><br/>
+    <p class="lead">
+        <a class="btn btn-primary btn-lg" href="${pageContext.request.contextPath}/" role="button">Go home</a>
+    </p>
+</div>
+
 </body>
 </html>

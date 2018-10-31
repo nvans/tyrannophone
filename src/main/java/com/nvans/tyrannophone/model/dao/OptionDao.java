@@ -4,4 +4,8 @@ import com.nvans.tyrannophone.model.entity.Option;
 
 public interface OptionDao extends GenericDao<Option> {
     Option findByIdEager(Long optionId);
+
+    Option findByName(String optionName);
+
+    Option findByNameEager(String optionName);
 }

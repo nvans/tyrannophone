@@ -1,53 +1,61 @@
 package com.nvans.tyrannophone.model.dto;
 
+import com.nvans.tyrannophone.model.entity.Contract;
 import com.nvans.tyrannophone.model.entity.Customer;
-import com.nvans.tyrannophone.model.entity.User;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public class CustomerDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private String firstName = "Your first name";
+    private Long customerId;
 
-    private String lastName = "Your last name";
+    private String firstName;
 
-    private String email = "Your e-mail";
+    private String lastName;
 
-    private String address = "Your address";
+    private String email;
 
-    private String passport = "Your passport number";
+    private String address;
 
-    private String password = "Your password";
+    private String passport;
 
-    private String newPassword = "New password";
+    private List<Long> contracts;
 
-    private String newPasswordConfirmation = "Confirm password";
+    private boolean isActive;
 
     public CustomerDto() {
 
     }
 
-    public CustomerDto(User user) {
-
-        Customer customer = (Customer) user.getDetails();
-
-        this.firstName = customer.getFirstName();
-        this.lastName = customer.getLastName();
-        this.email = user.getEmail();
-        this.address = customer.getAddress();
-        this.passport = customer.getPassport();
-
-    }
-
     public CustomerDto(Customer customer) {
 
+        this.customerId = customer.getId();
         this.firstName = customer.getFirstName();
         this.lastName = customer.getLastName();
         this.email = customer.getUser().getEmail();
         this.address = customer.getAddress();
         this.passport = customer.getPassport();
+        this.isActive = customer.getUser().isActive();
+
+        this.contracts = new ArrayList<>();
+
+        for (Contract contract : customer.getContracts()) {
+            this.contracts.add(contract.getContractNumber());
+        }
+        this.contracts.sort(Comparator.naturalOrder());
+    }
+
+    public Long getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
     }
 
     public String getFirstName() {
@@ -88,5 +96,21 @@ public class CustomerDto implements Serializable {
 
     public void setPassport(String passport) {
         this.passport = passport;
+    }
+
+    public List<Long> getContracts() {
+        return contracts;
+    }
+
+    public void setContracts(List<Long> contracts) {
+        this.contracts = contracts;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }

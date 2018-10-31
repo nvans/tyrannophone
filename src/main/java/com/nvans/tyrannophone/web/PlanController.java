@@ -1,5 +1,6 @@
 package com.nvans.tyrannophone.web;
 
+import com.nvans.tyrannophone.model.dto.PlanDto;
 import com.nvans.tyrannophone.model.entity.Plan;
 import com.nvans.tyrannophone.service.OptionService;
 import com.nvans.tyrannophone.service.PlanService;
@@ -38,14 +39,14 @@ public class PlanController {
     @GetMapping(value = "/add")
     public String addPlan(Model model) {
 
-        model.addAttribute("plan", new Plan());
-        model.addAttribute("options", optionService.getAllOptions());
+        model.addAttribute("plan", new PlanDto());
+        model.addAttribute("options", optionService.getAllOptionsDtoList());
 
         return "plans/add";
     }
 
     @PostMapping("/add")
-    public String addPlan(@Valid @ModelAttribute Plan plan, BindingResult result, SessionStatus sessionStatus) {
+    public String addPlan(@Valid @ModelAttribute("plan") PlanDto plan, BindingResult result, SessionStatus sessionStatus) {
 
         if (result.hasErrors()) {
             return "plans/add";
@@ -61,13 +62,13 @@ public class PlanController {
     public String editPlan(@PathVariable Long planId, Model model) {
 
         model.addAttribute("plan", planService.getPlan(planId));
-        model.addAttribute("options", optionService.getAllOptions());
+        model.addAttribute("options", optionService.getAllOptionsDtoList());
 
         return "plans/edit";
     }
 
     @PostMapping("/edit")
-    public String editPlan(@ModelAttribute Plan plan, BindingResult result, SessionStatus sessionStatus) {
+    public String editPlan(@ModelAttribute("plan") PlanDto plan, BindingResult result, SessionStatus sessionStatus) {
 
         if (result.hasErrors()) {
             return "plans/edit";

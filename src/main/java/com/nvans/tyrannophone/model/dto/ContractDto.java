@@ -43,8 +43,8 @@ public class ContractDto implements Serializable {
         this.compatibleOptions = new HashSet<>();
         this.incompatibleOptions = new HashSet<>();
 
-        for (Option optI : contract.getPlan().getAvailableOptions()) {
-            for (Option optJ : contract.getPlan().getAvailableOptions()) {
+        for (Option optI : contract.getPlan().getAvailableOptions().keySet()) {
+            for (Option optJ : contract.getPlan().getAvailableOptions().keySet()) {
                 if (optI.equals(optJ)) {
                     continue;
                 }

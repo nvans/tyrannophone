@@ -15,6 +15,9 @@ public interface OptionValidationService {
      */
     boolean isOptionsHierarchyValid(Set<Option> options);
 
+
+    boolean hasValidHierarchy(Option option);
+
     /**
      * The method validates incompatible options set for the one option.
      *

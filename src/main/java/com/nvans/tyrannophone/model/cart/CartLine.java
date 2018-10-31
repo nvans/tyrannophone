@@ -9,7 +9,7 @@ import java.util.List;
 
 //@Component
 //@SessionScope
-public class EmployeeCart {
+public class CartLine {
 
     private Long employeeId;
 

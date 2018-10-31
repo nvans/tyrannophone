@@ -7,6 +7,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +24,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService);
+    }
+
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
     }
 
     @Bean
@@ -45,7 +52,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests().antMatchers("/customers/**").hasRole("EMPLOYEE")
                 .and()
+                .authorizeRequests().antMatchers("/cart/**").hasAnyRole("CUSTOMER", "EMPLOYEE")
+                .and()
+                .authorizeRequests().antMatchers("/api/contracts/**").hasAnyRole("CUSTOMER", "EMPLOYEE")
+                .and()
+                .authorizeRequests().antMatchers("/api/plans/**").permitAll()
+                .and()
                 .authorizeRequests().antMatchers("/*").permitAll()
+                .and()
+                .authorizeRequests().antMatchers("/registration").anonymous()
+                .and()
+                .authorizeRequests().antMatchers("/resources/**").permitAll()
                 .and()
                 .formLogin()
                     .loginPage("/home").failureForwardUrl("/home/?error=true")
@@ -56,7 +73,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .exceptionHandling().accessDeniedPage("/403")
                 .and()
-                .csrf().disable();
+                .csrf().disable()
+                .sessionManagement().maximumSessions(-1).sessionRegistry(sessionRegistry()).expiredUrl("/home");
 
     }
 

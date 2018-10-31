@@ -1,16 +1,10 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: ACER
-  Date: 04.09.2018
-  Time: 5:10
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
 <html>
 <head>
     <title>Just test</title>
+    <script src="webjars/react/16.4.2"></script>
 </head>
 <body>
-    It's alive! ALIVE!
+    <main id="app"></main>
 </body>
 </html>

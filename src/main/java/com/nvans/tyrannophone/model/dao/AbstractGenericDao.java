@@ -1,9 +1,9 @@
 package com.nvans.tyrannophone.model.dao;
 
+import org.springframework.util.CollectionUtils;
+
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceException;
 import java.io.Serializable;
 import java.util.List;
 
@@ -24,6 +24,7 @@ public abstract class AbstractGenericDao<T extends Serializable> implements Gene
 
     @Override
     public T findById(Long id) {
+
         return entityManager.find(type, id);
     }
 
@@ -37,18 +38,7 @@ public abstract class AbstractGenericDao<T extends Serializable> implements Gene
 
     @Override
     public void save(T entity) {
-
-        try {
-            entityManager.persist(entity);
-        }
-        catch (PersistenceException ex) {
-//            if (ex.getCause() instanceof ConstraintViolationException) {
-//                throw new ObjectCantBeSavedException(type.getSimpleName() + " with this parameters already exists.");
-//            }
-//            else {
-                throw ex;
-//            }
-        }
+        entityManager.persist(entity);
     }
 
     @Override
@@ -71,16 +61,14 @@ public abstract class AbstractGenericDao<T extends Serializable> implements Gene
     public T findByParam(String param, Object value) {
         if (param == null || param.isEmpty()) return null;
 
-        try {
-            return entityManager.createQuery(
-                    "select o from " + type.getSimpleName() +
-                            " o where o." + param + " = :obj", type)
+        List<T> result =  entityManager.createQuery(
+                    "SELECT o FROM " + type.getSimpleName() + " " +
+                    "o WHERE o." + param + " = :obj", type)
                     .setParameter("obj", value)
-                    .getSingleResult();
-        }
-        catch (NoResultException | IllegalArgumentException ex) {
-            return null;
-        }
+                    .getResultList();
+
+        return CollectionUtils.isEmpty(result) ? null : result.get(0);
+
     }
 
     @Override

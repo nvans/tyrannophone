@@ -34,7 +34,7 @@
                 <artifactId>tomcat7-maven-plugin</artifactId>
                 <version>2.2</version>
                 <configuration>
-                    <path>/Tyrannophone</path>
+                    <path>/tyrannophone</path>
                     <username>tyrannophone</username>
                     <password>tyrannophone</password>
                 </configuration>
@@ -75,6 +75,14 @@
             <version>${spring.version}</version>
         </dependency>
 
+        <!-- A O P -->
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>1.9.1</version>
+        </dependency>
+
+
         <!--                              *** S E C U R I T Y ***                      -->
 
         <dependency>
@@ -103,6 +111,7 @@
 
 
         <!--                              *** P E R S I S T I N G ***                      -->
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
@@ -125,6 +134,20 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.47</version>
+        </dependency>
+
+
+        <!-- Caching -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-jcache</artifactId>
+            <version>5.3.5.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>3.6.1</version>
         </dependency>
 
         <!--                              *** P R E S E N T A T I O N ***                      -->
@@ -167,17 +190,32 @@
             <version>0.34</version>
         </dependency>
 
+
+        <!-- Jackson -->
         <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>momentjs</artifactId>
-            <version>2.22.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>tempusdominus-bootstrap-4</artifactId>
-            <version>5.0.0</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.9.7</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.9.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>1.9.13</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.9.13</version>
+        </dependency>
+        
         <!--                              *** V A L I D A T I O N ***                      -->
         <dependency>
             <groupId>javax.validation</groupId>
@@ -190,6 +228,20 @@
             <artifactId>hibernate-validator</artifactId>
             <version>6.0.13.Final</version>
         </dependency>
+
+        <!--                              *** M E S S A G I N G ***                      -->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>artemis-jms-server</artifactId>
+            <version>2.6.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jms</artifactId>
+            <version>5.1.0.RELEASE</version>
+        </dependency>
+
 
         <!--                              *** T E S T I N G ***                      -->
 
@@ -207,6 +259,14 @@
           <scope>test</scope>
         </dependency>
 
+        <!-- Mockito -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.22.0</version>
+            <scope>test</scope>
+        </dependency>
+
         <!--                              *** L O G G I N G  ***                      -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -219,6 +279,7 @@
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
         </dependency>
+
 
     </dependencies>
 

@@ -14,7 +14,7 @@ import java.util.List;
 
 @Component
 @SessionScope
-public class CustomerCart {
+public class Cart {
 
     private Contract contract;
 

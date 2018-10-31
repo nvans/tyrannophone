@@ -3,63 +3,72 @@
 <html>
 <head>
     <title>Edit option</title>
-    <%@include file="../templates/header.jsp"%>
+    <%@include file="../templates/header.jsp" %>
 </head>
 <body>
-    <%@include file="../templates/navigation.jsp"%>
-    <%@include file="../templates/employee-navigation.jsp"%>
+<%@include file="../templates/navigation.jsp" %>
+<%@include file="../templates/employee-navigation.jsp" %>
 
 <sec:authorize access="hasRole('EMPLOYEE')">
-    <form:form method="post" action="/options/editHierarchy" modelAttribute="option">
-        <table>
-            <tr>
-                <td>Option id</td>
-                <td><form:input path="id" readonly="true"/></td>
-            </tr>
-            <tr>
-                <td>Option name</td>
-                <td><form:input path="name" readonly="true"/></td>
-            </tr>
-            <tr>
-                <td>Option price</td>
-                <td><form:input path="price" readonly="true"/></td>
-            </tr>
-            <tr>
-                <td>Available:</td>
-                <td><form:checkbox path="connectionAvailable" /></td>
-            </tr>
-            <tr>
-                <td>Parent option:</td>
-                <td>
-                    <c:set var="parentName" value="${option.parentOption == null ? 'NONE' : option.parentOption.name}"/>
-                    <form:select path="parentOption">
 
-                        <form:option value="${null}">NONE</form:option>
-                        <form:option value="${option.parentOption}"><c:out value="${parentName}"/></form:option>
+    <c:if test="${error != null}">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>${error}</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </c:if>
 
-                        <c:forEach items="${options}" var="opt1">
-                            <form:option value="${opt1.id}">${opt1.name}</form:option>
-                        </c:forEach>
-
-                    </form:select>
-                </td>
-            </tr>
-            <tr>
-                <td><br/><br/></td>
-            </tr>
-            <tr>
-                <td>Children options:</td>
-                <td>
-                    <form:select path="childOptions" multiple="true">
-                        <form:option value="">NONE</form:option>
-                        <form:options items="${options}" itemValue="id" itemLabel="name"/>
-                    </form:select>
-                </td>
-            </tr>
-            
-        </table>
-        <form:button name="Modify">Modify option</form:button>
-    </form:form>
+    <div class="container">
+        <div class="row">
+            <div class="col-8 col-md-auto mx-auto">
+                <form:form method="post" action="/options/${option.id}/editHierarchy" modelAttribute="option">
+                    <h2 class="mb-0 text-center">Dependencies for option</h2><br/>
+                    <h4 class="mb-0 text-center">"${option}"</h4>
+                    <br/><br/>
+                        <form:hidden path="id" readonly="true"/>
+                        <form:hidden path="name" readonly="true"/>
+                        <form:hidden path="price" readonly="true"/>
+                        <form:hidden path="connectionAvailable"/>
+                    <div class="form-group">
+                        <label class="font-weight-bold">Parent option</label>
+                        <c:set var="parentName" value="${option.parentOption == null ? 'NONE' : option.parentOption.name}"/>
+                        <form:select cssClass="form-control font-weight-bold" path="parentOption">
+                            <form:option value="${null}">NONE</form:option>
+                            <form:option value="${option.parentOption}">
+                                <c:out value="${parentName}"/>
+                            </form:option>
+                            <c:forEach items="${options}" var="opt">
+                                <form:option value="${opt.id}">${opt.name}</form:option>
+                            </c:forEach>
+                        </form:select>
+                    </div>
+                    <br/>
+                    <h4 class="mb-0 text-center">Children options:</h4>
+                    <br />
+                    <table class="table table-striped table-sm">
+                        <thead>
+                            <tr><th>Name</th><th>Child</th></tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach items="${options}" var="option" varStatus="counter">
+                                <tr>
+                                    <td class="font-weight-bold">${option.name}</td>
+                                    <td><form:checkbox path="childOptions" value="${option}"/></td>
+                                </tr>
+                            </c:forEach>
+                                <%--<form:checkboxes path="childOptions" items="${options}" itemValue="id" itemLabel="name"--%>
+                                                 <%--cssClass="check-box" delimiter="<br/>"/>--%>
+                        </tbody>
+                    </table>
+                    <form:button class="btn btn-primary float-right" name="Modify">Save</form:button>
+                    <input type="reset" class="btn btn-danger" value="Reset"/>
+                </form:form>
+                <a class="btn btn-danger" href=".">Cancel</a>
+            </div>
+        </div>
+    </div>
 </sec:authorize>
 </body>
 </html>

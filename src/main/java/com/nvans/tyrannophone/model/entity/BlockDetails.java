@@ -26,6 +26,17 @@ public class BlockDetails implements Serializable {
     @Column(name = "block_ts", updatable = false, nullable = false)
     private LocalDateTime blockTs;
 
+    public BlockDetails() {
+    }
+
+    public BlockDetails(BlockDetails other) {
+
+        this.id = other.id;
+        this.blockedByUser = other.blockedByUser;
+        this.blockedBefore = other.blockedBefore;
+        this.reason = new String(other.reason);
+        this.blockTs = other.blockTs;
+    }
 
     /**
      * Method adds current timestamp
@@ -76,14 +87,4 @@ public class BlockDetails implements Serializable {
         this.blockTs = blockTs;
     }
 
-    //    @Override
-//    public String toString() {
-//        return "BlockDetails{" +
-//                "id=" + id +
-//                ", blockedByUser=" + blockedByUser +
-//                ", blockedBefore=" + blockedBefore +
-//                ", reason='" + reason + '\'' +
-//                ", blockTs=" + blockTs +
-//                '}';
-//    }
 }

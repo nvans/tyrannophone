@@ -12,7 +12,6 @@ public class Contract implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
     @Id
     @Column(name = "contract_number", length = 9)
     @ContractNumber
@@ -42,6 +41,10 @@ public class Contract implements Serializable {
            joinColumns = @JoinColumn(name = "contract_number", referencedColumnName = "contract_number"),
            inverseJoinColumns = @JoinColumn(name = "block_details_id", referencedColumnName = "id"))
     private BlockDetails blockDetails;
+
+    public Integer getMonthlyPrice() {
+        return plan.getConnectionPrice() + options.stream().mapToInt(Option::getPrice).sum();
+    }
 
     // Getters and Setters -->
     public Long getContractNumber() {
@@ -96,4 +99,8 @@ public class Contract implements Serializable {
     // <-- Getters and Setters
 
 
+    @Override
+    public String toString() {
+        return contractNumber.toString();
+    }
 }

@@ -13,11 +13,11 @@ public class Employee extends Details {
     @Column(name = "position", nullable = false)
     private String position;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "manager_id")
     private Employee manager;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "employee_contract",
             joinColumns = {@JoinColumn(name = "employee_id",
                     referencedColumnName = "id")},

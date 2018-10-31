@@ -2,11 +2,9 @@ package com.nvans.tyrannophone.web;
 
 import com.nvans.tyrannophone.model.dto.CustomerDto;
 import com.nvans.tyrannophone.model.entity.Customer;
-import com.nvans.tyrannophone.model.security.CustomUserPrinciple;
 import com.nvans.tyrannophone.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 
 import javax.validation.Valid;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +20,10 @@ import java.util.List;
 @Secured("ROLE_EMPLOYEE")
 @RequestMapping("/customers")
 @SessionAttributes({"customer", "customers"})
-public class CustomersController {
+public class CustomerController {
+
+    private static final String FIRST_PAGE = "1";
+    private static final String DEFAULT_PAGE_SIZE = "10";
 
     @Autowired
     private CustomerService customerService;
@@ -32,10 +32,18 @@ public class CustomersController {
     private SessionRegistry sessionRegistry;
 
     @GetMapping
-    public String showCustomers(Model model) {
+    public String showCustomers(@RequestParam(defaultValue = FIRST_PAGE) Integer page,
+                                @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) Integer pageSize,
+                                Model model) {
 
-        List<Customer> customers = customerService.getAllCustomers();
+        int lastPage = customerService.getLastPageNumber(pageSize);
+
+        page = (page > lastPage) ? lastPage : page;
+
+        List<Customer> customers = customerService.getCustomersPage(page, pageSize);
         model.addAttribute("customers", customers);
+        model.addAttribute("page", page);
+        model.addAttribute("lastPage", lastPage);
 
         return "customers";
     }

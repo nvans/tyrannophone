@@ -1,5 +1,7 @@
 package com.nvans.tyrannophone.model.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.PositiveOrZero;
@@ -8,9 +10,11 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Entity
 @Table(name = "options")
-public class Option implements Serializable {
+public class Option implements Serializable, Comparable<Option> {
 
     private static final long serialVersionUID = 1L;
 
@@ -19,7 +23,8 @@ public class Option implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Pattern(regexp = "^[A-Z][A-Za-z0-9()+ ]{2,}", message = "Invalid option name.")
+    @Pattern(regexp = "^[A-Z][A-Za-z0-9()+ ]{2,}",
+            message = "Invalid option name. Min 3 english letters and first is upper-cased.")
     @Column(name = "name", nullable = false, unique = true, updatable = false)
     private String name;
 
@@ -30,19 +35,20 @@ public class Option implements Serializable {
     @Column(name = "is_available")
     private boolean isConnectionAvailable;
 
-    @OneToMany(cascade = {CascadeType.PERSIST})
+
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(name = "option_incompatible_option",
         joinColumns = @JoinColumn(name = "option_id", referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name = "inc_option_id", referencedColumnName = "id"))
     private Set<Option> incompatibleOptions = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
     @JoinTable(name = "option_dependencies",
             joinColumns = @JoinColumn(name = "option_id"),
             inverseJoinColumns = @JoinColumn(name = "parent_option_id"))
     private Option parentOption;
 
-    @OneToMany(mappedBy = "parentOption", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(mappedBy = "parentOption", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private Set<Option> childOptions = new HashSet<>();
 
     // Getters and Setters -->
@@ -92,11 +98,13 @@ public class Option implements Serializable {
     }
 
     public void setParentOption(Option parentOption) {
+
         this.parentOption = parentOption;
 
         if (parentOption != null) {
             parentOption.getChildOptions().add(this);
         }
+
     }
 
     public Set<Option> getChildOptions() {
@@ -104,8 +112,15 @@ public class Option implements Serializable {
     }
 
     public void setChildOptions(Set<Option> childOptions) {
+
         this.childOptions = childOptions;
+
+        if (childOptions != null) {
+            childOptions.forEach(o -> o.setParentOption(this));
+        }
+
     }
+
 
     // <-- Getters and Setters
 
@@ -130,4 +145,12 @@ public class Option implements Serializable {
     public String toString() {
         return name;
     }
+
+    @Override
+    public int compareTo(Option o) {
+        if (o == null) return 1;
+
+        return this.getName().compareTo(o.getName());
+    }
+
 }

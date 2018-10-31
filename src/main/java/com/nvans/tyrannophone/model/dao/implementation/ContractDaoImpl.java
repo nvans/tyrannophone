@@ -5,8 +5,8 @@ import com.nvans.tyrannophone.model.dao.ContractDao;
 import com.nvans.tyrannophone.model.entity.Contract;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
-import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.List;
 
@@ -44,15 +44,9 @@ public class ContractDaoImpl
                 "WHERE c.contractNumber = :contractNumber", Contract.class);
         query.setParameter("contractNumber", contractNumber);
 
-        try {
-            return query.getSingleResult();
-        }
-        catch (NoResultException ex) {
+        List<Contract> result = query.getResultList();
 
-            logger.debug("Contract '" + contractNumber + "' not found");
-
-            return null;
-        }
+        return CollectionUtils.isEmpty(result) ? null : result.get(0);
     }
 
     @Override
@@ -69,13 +63,27 @@ public class ContractDaoImpl
         query.setParameter("contractNumber", contractNumber);
         query.setParameter("customerId", customerId);
 
-        try {
-            return query.getSingleResult();
-        }
-        catch (NoResultException ex) {
-            logger.debug("Contract'" + contractNumber + "' not found");
+        List<Contract> result = query.getResultList();
 
-            return null;
-        }
+        return CollectionUtils.isEmpty(result) ? null : result.get(0);
     }
+
+    @Override
+    public List<Contract> getContractPage(int pageNumber, int pageSize) {
+
+
+        if (pageNumber < 1) {
+            pageNumber = 1;
+        }
+
+        int firstResult = (pageNumber - 1) * pageSize;
+
+        TypedQuery<Contract> query = entityManager.createQuery(
+                "SELECT c FROM Contract c", Contract.class);
+        query.setFirstResult(firstResult);
+        query.setMaxResults(pageSize);
+
+        return query.getResultList();
+    }
+
 }

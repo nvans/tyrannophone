@@ -41,14 +41,26 @@ public class JPAConfig {
     public Properties hibernateProperties() {
         Properties hibernateProp = new Properties();
 
+        // Driver
         hibernateProp.put("hibernate.dialect", Objects.requireNonNull(env.getProperty("hibernate.dialect")));
         hibernateProp.put("hibernate.format_sql", Objects.requireNonNull(env.getProperty("hibernate.format_sql")));
         hibernateProp.put("hibernate.hbm2ddl.auto", Objects.requireNonNull(env.getProperty("hibernate.hbm2ddl.auto")));
+
+        // Output
         hibernateProp.put("hibernate.use_sql_comments", Objects.requireNonNull(env.getProperty("hibernate.use_sql_comments")));
         hibernateProp.put("hibernate.show_sql", Objects.requireNonNull(env.getProperty("hibernate.show_sql")));
+        hibernateProp.put("hibernate.generate_statistics", Objects.requireNonNull(env.getProperty("hibernate.generate_statistics")));
+
+        // Batching and Fetching
         hibernateProp.put("hibernate.max_fetch_depth", Objects.requireNonNull(env.getProperty("hibernate.max_fetch_depth")));
         hibernateProp.put("hibernate.jdbc_batch_size", Objects.requireNonNull(env.getProperty("hibernate.jdbc_batch_size")));
         hibernateProp.put("hibernate.jdbc.fetch_size", Objects.requireNonNull(env.getProperty("hibernate.jdbc.fetch_size")));
+
+        // Caching
+        hibernateProp.put("hibernate.cache.use_second_level_cache", Objects.requireNonNull(env.getProperty("hibernate.cache.use_second_level_cache")));
+        hibernateProp.put("hibernate.cache.region.factory_class", Objects.requireNonNull(env.getProperty("hibernate.cache.region.factory_class")));
+        hibernateProp.put("hibernate.javax.cache.provider", Objects.requireNonNull(env.getProperty("hibernate.javax.cache.provider")));
+        hibernateProp.put("hibernate.javax.cache.missing_cache_strategy", Objects.requireNonNull(env.getProperty("hibernate.javax.cache.missing_cache_strategy")));
 
         return hibernateProp;
     }
@@ -77,8 +89,4 @@ public class JPAConfig {
         return new JpaTransactionManager(entityManagerFactory());
     }
 
-//    @Bean
-//    public GenericDao<User> userDao() {
-//        return new GenericDaoImpl<>(User.class);
-//    }
 }

@@ -15,12 +15,6 @@ public class Customer extends Details {
     private Integer balance;
 
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
-//    @JoinTable(name = "customer_contract",
-//               joinColumns = {@JoinColumn(name = "customer_id",
-//                                          referencedColumnName = "id")},
-//               inverseJoinColumns = {@JoinColumn(name = "contract_number",
-//                                                 referencedColumnName = "contract_number",
-//                                                 unique = true)})
     private Set<Contract> contracts = new HashSet<>();
 
     // Getters and Setters -->

@@ -9,7 +9,6 @@ import java.util.Objects;
 public abstract class Details implements Serializable {
 
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
@@ -24,8 +23,6 @@ public abstract class Details implements Serializable {
 
     @Column(name = "address", nullable = false)
     private String address;
-
-
 
     @MapsId
     @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})

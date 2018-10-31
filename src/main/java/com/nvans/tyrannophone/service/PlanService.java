@@ -1,5 +1,7 @@
 package com.nvans.tyrannophone.service;
 
+import com.nvans.tyrannophone.model.dto.PlanDto;
+import com.nvans.tyrannophone.model.dto.PlanView;
 import com.nvans.tyrannophone.model.entity.Option;
 import com.nvans.tyrannophone.model.entity.Plan;
 
@@ -13,7 +15,7 @@ public interface PlanService {
      *
      * @return list of plans
      */
-    List<Plan> getAllPlans();
+    List<PlanDto> getAllPlans();
 
     /**
      * The method retrieves a single plan by id.
@@ -22,7 +24,7 @@ public interface PlanService {
      *
      * @return plan.
      */
-    Plan getPlan(Long planId);
+    PlanDto getPlan(Long planId);
 
     /**
      * The method retrieves a single plan by name.
@@ -33,14 +35,16 @@ public interface PlanService {
      */
     Plan getPlan(String planName);
 
+    PlanDto getPlanDto(String planName);
+
     /**
      * The method adds new plan to the system.
      *
      * @param plan - plan object
      */
-    void addPlan(Plan plan);
+    void addPlan(PlanDto plan);
 
-    void updatePlan(Plan plan);
+    void updatePlan(PlanDto planDto);
 
     /**
      * The method deletes an existed plan from the system by id.
@@ -59,4 +63,7 @@ public interface PlanService {
     void changeAvailableOptions(Long planId, Set<Option> changedOptions);
 
 
+    List<PlanView> getAllPlansViews();
+
+    PlanView getPlanView(Long planId);
 }

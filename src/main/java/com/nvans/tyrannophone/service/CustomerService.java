@@ -1,11 +1,14 @@
 package com.nvans.tyrannophone.service;
 
 import com.nvans.tyrannophone.model.dto.CustomerDto;
+import com.nvans.tyrannophone.model.dto.CustomerRegistrationDto;
 import com.nvans.tyrannophone.model.entity.Customer;
 
 import java.util.List;
 
 public interface CustomerService {
+
+    void registerCustomer(CustomerRegistrationDto registrationDto);
 
     /**
      * The method retrieves details of the authenticated customer.
@@ -15,7 +18,7 @@ public interface CustomerService {
     Customer getCustomerDetails();
 
 
-    Customer getCustomerById(Long id);
+    CustomerDto getCustomerById(Long id);
 
     /**
      * The method retrieves list of all customers.
@@ -46,12 +49,15 @@ public interface CustomerService {
     /**
      * The method changes the customer state to inactive
      *
-     * @param customer - the customer object
+     * @param customerId - the customer's id
      */
-    void blockCustomer(Customer customer);
+    void blockCustomer(Long customerId, String reason);
 
+    void unblockCustomer(Long customerId);
 
-    void unblockCustomer(Customer customer);
+    void updateCustomer(CustomerDto customerDto);
 
-    void updateCustomer(Customer customer);
+    List<Customer> getCustomersPage(Integer page, Integer pageSize);
+
+    int getLastPageNumber(Integer pageSize);
 }

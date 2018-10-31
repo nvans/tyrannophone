@@ -1,5 +1,6 @@
 package com.nvans.tyrannophone.service;
 
+import com.nvans.tyrannophone.model.dto.ContractView;
 import com.nvans.tyrannophone.model.entity.Contract;
 
 import java.util.List;
@@ -25,6 +26,10 @@ public interface ContractService {
      */
     List<Contract> getAllContracts();
 
+    List<Contract> getContractsPage(int pageNumber, int pageSize);
+
+    int getLastPageNumber(int pageSize);
+
     /**
      * The method sets the state of the contract to inactive.
      *
@@ -41,7 +46,9 @@ public interface ContractService {
     void unblockContract(Long contractNumber);
 
 
-    void addContract(Contract contract);
+    void addContract(Contract contract, Long customerId);
 
     void updateContract(Contract contract);
+
+    ContractView getContractView(Long contractNumber);
 }
