@@ -12,6 +12,7 @@ import com.nvans.tyrannophone.model.entity.Option;
 import com.nvans.tyrannophone.service.*;
 import com.nvans.tyrannophone.service.helper.OptionsGraph;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@Secured({"ROLE_CUSTOMER", "ROLE_EMPLOYEE"})
 public class OrderServiceImpl implements OrderService {
 
     @Autowired

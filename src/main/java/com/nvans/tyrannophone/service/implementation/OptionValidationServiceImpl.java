@@ -36,8 +36,6 @@ public class OptionValidationServiceImpl implements OptionValidationService {
 
         if (options == null) return false;
 
-
-
         return !(cycleFinderService.hasCycle(optionsGraph.getAdj(options)));
     }
 

@@ -149,6 +149,7 @@ public class OptionServiceImpl implements OptionService {
     }
 
     @Override
+    @Secured({"ROLE_EMPLOYEE"})
     public void addOption(Option option) {
 
         log.info("Adding option [" + option.getName() + "]");
@@ -171,6 +172,7 @@ public class OptionServiceImpl implements OptionService {
     }
 
     @Override
+    @Secured({"ROLE_EMPLOYEE"})
     public void editOptionHierarchy(Option option) {
 
         log.info("Editing option hierarchy for option [" + option.getName() + "]");
@@ -203,6 +205,7 @@ public class OptionServiceImpl implements OptionService {
     }
 
     @Override
+    @Secured({"ROLE_EMPLOYEE"})
     public void updateCompatibility(Option option) {
 
         log.info("Updating options compatibility");
@@ -248,6 +251,7 @@ public class OptionServiceImpl implements OptionService {
     }
 
     @Override
+    @Secured({"ROLE_EMPLOYEE"})
     public void updateOption(Option option) {
 
 //        optionValidationService.isOptionsHierarchyValid()

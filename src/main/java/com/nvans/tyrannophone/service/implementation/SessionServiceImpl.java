@@ -5,6 +5,7 @@ import com.nvans.tyrannophone.service.SessionService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class SessionServiceImpl implements SessionService {
     private SessionRegistry sessionRegistry;
 
     @Async
+    @Secured("ROLE_EMPLOYEE")
     @Override
     public void invalidateSession(Long userId) {
 

@@ -145,6 +145,7 @@ public class PlanServiceImpl implements PlanService {
 
     @Override
     @NotifyShowcase
+    @Secured({"ROLE_EMPLOYEE"})
     public void updatePlan(PlanDto planDto) {
 
         log.info("Updating plan");
@@ -188,8 +189,8 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
-    @Secured({"ROLE_EMPLOYEE"})
     @NotifyShowcase
+    @Secured({"ROLE_EMPLOYEE"})
     public void deletePlan(Long planId) {
 
         log.info("Deleting plan " + planId);
