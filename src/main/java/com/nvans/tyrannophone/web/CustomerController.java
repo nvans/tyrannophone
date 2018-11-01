@@ -36,7 +36,7 @@ public class CustomerController {
                                 @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) Integer pageSize,
                                 Model model) {
 
-        int lastPage = customerService.getLastPageNumber(pageSize);
+        int lastPage = customerService.getCustomersLastPageNumber(pageSize);
 
         page = (page > lastPage) ? lastPage : page;
 

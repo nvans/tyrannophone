@@ -3,6 +3,7 @@ package com.nvans.tyrannophone.web;
 import com.nvans.tyrannophone.exception.TyrannophoneException;
 import com.nvans.tyrannophone.model.cart.Cart;
 import com.nvans.tyrannophone.model.CustomerInfo;
+import com.nvans.tyrannophone.model.cart.OrderCart;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -22,10 +23,13 @@ public class GlobalControllerAdvice {
     @Autowired
     private CustomerInfo customerInfo;
 
-    @ExceptionHandler(TyrannophoneException.class)
+    @Autowired
+    private OrderCart orderCart;
+
+    @ExceptionHandler(Exception.class)
     public ModelAndView exceptionHandler(Exception ex) {
 
-        log.warn(ex.getMessage());
+        log.info(ex.getMessage());
 
         ModelAndView modelAndView = new ModelAndView("error");
 
@@ -50,5 +54,8 @@ public class GlobalControllerAdvice {
     public CustomerInfo customerInfo() {
         return customerInfo;
     }
+
+    @ModelAttribute("orders")
+    public OrderCart orderCart() {return orderCart; }
 
 }

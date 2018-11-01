@@ -7,8 +7,9 @@
 <body>
 <%@include file="templates/navigation.jsp" %>
 <%@include file="templates/employee-navigation.jsp" %>
+<%@include file="templates/customer-navigation.jsp" %>
 
-<sec:authorize access="hasRole('EMPLOYEE')">
+
     <div class="container">
         <table class="table table-hover">
             <thead>
@@ -21,9 +22,11 @@
                     <td onclick="showPlan(${plan.id})">${plan.connectionPrice}</td>
                     <td onclick="showPlan(${plan.id})">${plan.monthlyPrice}</td>
                     <td onclick="showPlan(${plan.id})">${plan.connectionAvailable}</td>
+                    <sec:authorize access="hasRole('EMPLOYEE')">
                     <td>
                         <a class="btn btn-primary" role="button" href="/plans/${plan.id}">Edit</a>
                     </td>
+                    </sec:authorize>
                 </tr>
             </c:forEach>
             </tbody>
@@ -105,8 +108,5 @@
             }
         }
     </script>
-
-
-</sec:authorize>
 </body>
 </html>

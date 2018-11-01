@@ -1,7 +1,6 @@
 package com.nvans.tyrannophone.service.implementation;
 
 import com.nvans.tyrannophone.aop.NotifyShowcase;
-import com.nvans.tyrannophone.aop.NotifyShowcaseAspect;
 import com.nvans.tyrannophone.exception.TyrannophoneException;
 import com.nvans.tyrannophone.model.dao.OptionDao;
 import com.nvans.tyrannophone.model.dao.PlanDao;
@@ -12,16 +11,12 @@ import com.nvans.tyrannophone.model.dto.PlansCache;
 import com.nvans.tyrannophone.model.entity.Contract;
 import com.nvans.tyrannophone.model.entity.Option;
 import com.nvans.tyrannophone.model.entity.Plan;
-import com.nvans.tyrannophone.model.security.CustomUserPrinciple;
 import com.nvans.tyrannophone.service.OptionService;
 import com.nvans.tyrannophone.service.PlanService;
 import com.nvans.tyrannophone.service.helper.OptionsGraph;
-import com.nvans.tyrannophone.utils.security.ApplicationAuthorities;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,27 +50,11 @@ public class PlanServiceImpl implements PlanService {
 
         log.info("Retrieving all plans");
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserPrinciple currentUser;
-
-        boolean isEmployee = false;// currentUser.getAuthorities().contains(ApplicationAuthorities.EMPLOYEE_AUTHORITY);
-
-        if (!(auth.getPrincipal() instanceof String)) {
-            currentUser = (CustomUserPrinciple) auth.getPrincipal();
-
-            if (currentUser.getAuthorities().contains(ApplicationAuthorities.EMPLOYEE_AUTHORITY)) {
-                isEmployee = true;
-            }
-        }
-
-
         if (!plansCache.isValid()) {
-            boolean finalIsEmployee = isEmployee;
-
             List<PlanDto> plans = planDao.findAll()
                     .stream()
                     .map(PlanDto::new)
-                    .filter(p -> finalIsEmployee || p.isConnectionAvailable())
+                    .filter(PlanDto::isConnectionAvailable)
                     .collect(Collectors.toList());
 
             plansCache.setPlans(plans);

@@ -37,6 +37,7 @@ public class OptionsGraph {
 
     /**
      * Retrieves set of children.
+     *
      * Non recursive pre-order tree traversal implementation.
      *
      * @param option - parent option

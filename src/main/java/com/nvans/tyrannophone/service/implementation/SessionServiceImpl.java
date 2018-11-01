@@ -1,6 +1,6 @@
 package com.nvans.tyrannophone.service.implementation;
 
-import com.nvans.tyrannophone.model.security.CustomUserPrinciple;
+import com.nvans.tyrannophone.model.security.TyrannophoneUser;
 import com.nvans.tyrannophone.service.SessionService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +27,13 @@ public class SessionServiceImpl implements SessionService {
 
         List<Object> principals = sessionRegistry.getAllPrincipals();
 
-        CustomUserPrinciple principal = null;
+        TyrannophoneUser principal = null;
 
         // Find blocked customer's principal
         for(Object o : principals) {
-            if (o instanceof CustomUserPrinciple) {
-                if (userId.equals(((CustomUserPrinciple) o).getUserId())) {
-                    principal = (CustomUserPrinciple) o;
+            if (o instanceof TyrannophoneUser) {
+                if (userId.equals(((TyrannophoneUser) o).getUserId())) {
+                    principal = (TyrannophoneUser) o;
                 }
             }
         }

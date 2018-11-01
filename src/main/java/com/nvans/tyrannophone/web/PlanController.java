@@ -17,7 +17,6 @@ import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/plans")
-@Secured("ROLE_EMPLOYEE")
 @SessionAttributes("options")
 public class PlanController {
 
@@ -37,6 +36,7 @@ public class PlanController {
     }
 
     @GetMapping(value = "/add")
+    @Secured("ROLE_EMPLOYEE")
     public String addPlan(Model model) {
 
         model.addAttribute("plan", new PlanDto());
@@ -46,6 +46,7 @@ public class PlanController {
     }
 
     @PostMapping("/add")
+    @Secured("ROLE_EMPLOYEE")
     public String addPlan(@Valid @ModelAttribute("plan") PlanDto plan, BindingResult result, SessionStatus sessionStatus) {
 
         if (result.hasErrors()) {
@@ -59,6 +60,7 @@ public class PlanController {
     }
 
     @GetMapping("/{planId}")
+    @Secured("ROLE_EMPLOYEE")
     public String editPlan(@PathVariable Long planId, Model model) {
 
         model.addAttribute("plan", planService.getPlan(planId));
@@ -68,6 +70,7 @@ public class PlanController {
     }
 
     @PostMapping("/edit")
+    @Secured("ROLE_EMPLOYEE")
     public String editPlan(@ModelAttribute("plan") PlanDto plan, BindingResult result, SessionStatus sessionStatus) {
 
         if (result.hasErrors()) {
@@ -81,6 +84,7 @@ public class PlanController {
     }
 
     @GetMapping("/delete/{planId}")
+    @Secured("ROLE_EMPLOYEE")
     public String deletePlan(@PathVariable Long planId) {
 
         planService.deletePlan(planId);

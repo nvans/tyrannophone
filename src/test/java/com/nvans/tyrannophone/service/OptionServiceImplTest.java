@@ -22,7 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class OptionServiceTest {
+public class OptionServiceImplTest {
 
     private PlanDao planDao = mock(PlanDao.class);
     private static OptionDao optionDao = mock(OptionDao.class);

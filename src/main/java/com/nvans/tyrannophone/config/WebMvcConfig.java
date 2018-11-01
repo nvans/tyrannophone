@@ -1,9 +1,6 @@
 package com.nvans.tyrannophone.config;
 
-import com.nvans.tyrannophone.service.helper.StringToCustomerConverter;
-import com.nvans.tyrannophone.service.helper.StringToOptionConverter;
-import com.nvans.tyrannophone.service.helper.StringToOptionDtoConverter;
-import com.nvans.tyrannophone.service.helper.StringToPlanConverter;
+import com.nvans.tyrannophone.service.helper.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.format.FormatterRegistry;
@@ -39,6 +36,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Autowired
     private StringToOptionDtoConverter stringToOptionDtoConverter;
+
+    @Autowired
+    private StringToPlanDtoConverter stringToPlanDtoConverter;
 
 
 
@@ -78,6 +78,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addConverter(stringToCustomerConverter);
         registry.addConverter(stringToPlanConverter);
         registry.addConverter(stringToOptionDtoConverter);
+        registry.addConverter(stringToPlanDtoConverter);
 
     }
 

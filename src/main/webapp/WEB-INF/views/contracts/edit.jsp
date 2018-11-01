@@ -18,23 +18,10 @@
         <div class="jumbotron">
             <h1 class="display-3">Contract is blocked!</h1>
             <p class="lead">
-                The contract '${contract.contractNumber}' was blocked on ${contract.blockDetails.blockTs.toLocalDate()}
-                <c:if test="${contract.blockDetails.blockedBefore != null}"> before ${contract.blockDetails.blockedBefore.toLocalDate()}.</c:if>
+                The contract '${contract.contractNumber}' was blocked!
             </p>
             <p class="lead">
-                <sec:authorize access="hasRole('CUSTOMER')">
-                    <c:choose>
-                        <c:when test="${contract.blockDetails.blockedByUser.id != contract.customer.id}">
-                            <a class="btn btn-primary btn-lg" href="#" role="button">Contact us</a>
-                        </c:when>
-                        <c:otherwise>
-                            <a class="btn btn-success btn-lg" href="${pageContext.request.contextPath}/contracts/unblock/${contract.contractNumber}" role="button">Unblock</a>
-                        </c:otherwise>
-                    </c:choose>
-                </sec:authorize>
-                <sec:authorize access="hasRole('EMPLOYEE')">
-                    <a class="btn btn-primary btn-lg" href="${pageContext.request.contextPath}/contracts/unblock/${contract.contractNumber}" role="button">Unblock</a>
-                </sec:authorize>
+                <a class="btn btn-primary btn-lg" href="${pageContext.request.contextPath}/contracts/unblock/${contract.contractNumber}" role="button">Activate</a>
             </p>
         </div>
     </c:if>
@@ -49,7 +36,7 @@
                     <label class="col-sm-4 col-form-label font-weight-bold">Owner</label>
                     <div class="col-sm-8">
                         <label class="form-control font-weight-bold">
-                                ${contract.customer.firstName} ${contract.customer.lastName}
+                                ${customer.firstName} ${customer.lastName}
                         </label>
                     </div>
                 </div>
@@ -77,7 +64,7 @@
                 <div class="form-group row">
                     <label for="monthlyPrice" class="col-sm-6 col-form-label font-weight-bold">Monthly price</label>
                     <div class="col-sm-6">
-                        <label class="form-control font-weight-bold" id="monthlyPrice">${contract.monthlyPrice}</label>
+                        <label class="form-control font-weight-bold" id="monthlyPrice">${contract.price}</label>
                     </div>
                 </div>
 
@@ -95,17 +82,17 @@
                                 <th>Price</th>
                             </thead>
                             <tbody>
-                                <c:forEach items="${currentPlanOpts}" var="optionEntry">
-                                    <c:set var="isOptRequired" value="${optionEntry.value}"/>
+                                <c:forEach items="${currentPlanOpts}" var="option">
+                                    <c:set var="isOptRequired" value="${option.connected}"/>
                                     <tr>
                                         <td>
                                             <c:if test="${isOptRequired}">
                                                 <img src="${pageContext.request.contextPath}/resources/images/lock.png" width="15px" height="15px"/>
                                             </c:if>
                                         </td>
-                                        <td>${optionEntry.key.name}</td>
-                                        <td><form:checkbox path="options" value="${optionEntry.key}" onclick="${isOptRequired ? 'return false;' : ''}"/></td>
-                                        <td>${optionEntry.key.price}</td>
+                                        <td>${option.name}</td>
+                                        <td><form:checkbox path="options" value="${option.name}" onclick="${isOptRequired ? 'return false;' : ''}"/></td>
+                                        <td>${option.price}</td>
                                     </tr>
                                 </c:forEach>
                             </tbody>

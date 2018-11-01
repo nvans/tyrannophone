@@ -25,7 +25,7 @@ public interface OptionValidationService {
      *
      * @return true if the set of options is valid, false otherwise.
      */
-    boolean isOptionsCompatible(Set<Option> options);
+    boolean areOptionsCompatible(Set<Option> options);
 
     boolean haveParentChildRelation(Option opt1, Option opt2);
 

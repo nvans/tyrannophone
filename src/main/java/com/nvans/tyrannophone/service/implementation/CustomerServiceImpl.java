@@ -4,24 +4,22 @@ import com.nvans.tyrannophone.model.dao.CustomerDao;
 import com.nvans.tyrannophone.model.dao.GenericDao;
 import com.nvans.tyrannophone.model.dto.CustomerDto;
 import com.nvans.tyrannophone.model.dto.CustomerRegistrationDto;
-import com.nvans.tyrannophone.model.entity.BlockDetails;
-import com.nvans.tyrannophone.model.entity.Customer;
-import com.nvans.tyrannophone.model.entity.Role;
-import com.nvans.tyrannophone.model.entity.User;
-import com.nvans.tyrannophone.model.security.CustomUserPrinciple;
+import com.nvans.tyrannophone.model.entity.*;
+import com.nvans.tyrannophone.model.security.TyrannophoneUser;
 import com.nvans.tyrannophone.service.CustomerService;
 import com.nvans.tyrannophone.service.SessionService;
-import com.nvans.tyrannophone.utils.security.ApplicationAuthorities;
+import com.nvans.tyrannophone.service.UserPrincipalFacade;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -29,6 +27,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     private static final Logger log = Logger.getLogger(CustomerServiceImpl.class);
 
+    @Autowired
+    private UserPrincipalFacade userPrincipalFacade;
+    
     @Autowired
     private GenericDao<User> userDao;
 
@@ -61,7 +62,7 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setLastName(registrationDto.getLastName());
         customer.setPassport(registrationDto.getPassport());
         customer.setAddress(registrationDto.getAddress());
-        customer.setBalance(0);
+        customer.setBalance(1000);
         customer.setUser(user);
 
         customerDao.save(customer);
@@ -72,8 +73,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Transactional(readOnly = true)
     public Customer getCustomerDetails() {
 
-        CustomUserPrinciple currentUser =
-                (CustomUserPrinciple) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        TyrannophoneUser currentUser = userPrincipalFacade.currentUser();
 
         return customerDao.findByIdEager(currentUser.getUserId());
     }
@@ -81,16 +81,18 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional(readOnly = true)
+    @Secured({"ROLE_EMPLOYEE", "ROLE_CUSTOMER"})
     public CustomerDto getCustomerById(Long id) {
 
-        Customer customer = customerDao.findById(id);
+        TyrannophoneUser currentUser = userPrincipalFacade.currentUser();
 
+        Customer customer = null;
 
-        if (customer != null) {
-            return new CustomerDto(customer);
+        if (currentUser.isEmployee() || currentUser.getUserId().equals(id)) {
+            customer = customerDao.findById(id);
         }
 
-        return null;
+        return (customer != null) ? new CustomerDto(customer) : null;
     }
 
     @Override
@@ -109,11 +111,24 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    @Secured("ROLE_EMPLOYEE")
     @Transactional(readOnly = true)
+    @Secured({"ROLE_EMPLOYEE", "ROLE_CUSTOMER"})
     public Customer getCustomerByContractNumber(Long contractNumber) {
 
-        return customerDao.getByContractNumber(contractNumber);
+        TyrannophoneUser currentUser = userPrincipalFacade.currentUser();
+
+        Customer customer = customerDao.getByContractNumber(contractNumber);
+
+        if (currentUser.isEmployee()) {
+            return customer;
+        }
+        else {
+
+            Set<Long> customerContractsNumbers = customer.getContracts()
+                    .stream().map(Contract::getContractNumber).collect(Collectors.toSet());
+
+            return customerContractsNumbers.contains(contractNumber) ? customer : null;
+        }
     }
 
     @Override
@@ -130,8 +145,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         log.info("Blocking customer with id{" + customerId + "}");
 
-        CustomUserPrinciple currentUser =
-                (CustomUserPrinciple) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        TyrannophoneUser currentUser = userPrincipalFacade.currentUser();
 
         BlockDetails blockDetails = new BlockDetails();
         blockDetails.setReason(reason == null ? "-" : reason);
@@ -146,15 +160,8 @@ public class CustomerServiceImpl implements CustomerService {
 
             userDao.update(customerUser);
 
-            log.info("Async method run");
-
             sessionService.invalidateSession(customerId);
-
-            log.info("After async");
         }
-
-
-
     }
 
     @Override
@@ -175,6 +182,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @Secured({"ROLE_EMPLOYEE", "ROLE_CUSTOMER"})
     public void updateCustomer(CustomerDto customerDto) {
 
         Customer customer = customerDao.findById(customerDto.getCustomerId());
@@ -189,6 +197,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @Secured({"ROLE_EMPLOYEE"})
     public List<Customer> getCustomersPage(Integer pageNumber, Integer pageSize) {
 
         if (pageNumber < 1) {
@@ -209,7 +218,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public int getLastPageNumber(Integer pageSize) {
+    @Secured({"ROLE_EMPLOYEE"})
+    public int getCustomersLastPageNumber(Integer pageSize) {
 
         long contractTotal = customerDao.count();
 
@@ -217,5 +227,27 @@ public class CustomerServiceImpl implements CustomerService {
         lastPage = lastPage < 1 ? 1 : lastPage;
 
         return (int) Math.ceil(lastPage);
+    }
+
+    @Override
+    @Secured({"ROLE_EMPLOYEE", "ROLE_CUSTOMER"})
+    public CustomerDto getCustomerDtoByContractNumber(Long contractNumber) {
+
+        TyrannophoneUser currentUser = userPrincipalFacade.currentUser();
+
+        Customer customer = customerDao.getByContractNumber(contractNumber);
+
+        if (customer == null) return null;
+
+        if (currentUser.isEmployee()) {
+            return new CustomerDto(customer);
+        }
+        else {
+            Set<Long> contractsNumbers = customer.getContracts()
+                    .stream().map(Contract::getContractNumber).collect(Collectors.toSet());
+
+            return (contractsNumbers.contains(contractNumber)) ? new CustomerDto(customer) : null;
+
+        }
     }
 }

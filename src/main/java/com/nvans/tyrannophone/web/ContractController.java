@@ -1,15 +1,16 @@
 package com.nvans.tyrannophone.web;
 
-import com.nvans.tyrannophone.exception.TyrannophoneException;
+import com.nvans.tyrannophone.model.CustomerInfo;
+import com.nvans.tyrannophone.model.Order;
+import com.nvans.tyrannophone.model.OrderStatus;
+import com.nvans.tyrannophone.model.OrderType;
 import com.nvans.tyrannophone.model.cart.Cart;
+import com.nvans.tyrannophone.model.cart.OrderCart;
+import com.nvans.tyrannophone.model.dto.ContractDto;
 import com.nvans.tyrannophone.model.dto.CustomerDto;
 import com.nvans.tyrannophone.model.dto.PlanDto;
 import com.nvans.tyrannophone.model.entity.Contract;
-import com.nvans.tyrannophone.model.entity.Option;
-import com.nvans.tyrannophone.service.ContractService;
-import com.nvans.tyrannophone.service.CustomerService;
-import com.nvans.tyrannophone.service.OptionService;
-import com.nvans.tyrannophone.service.PlanService;
+import com.nvans.tyrannophone.service.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 @Controller
 @SessionAttributes({"contract", "currentPlanOpts", "plans", "lastPage"})
@@ -32,20 +32,25 @@ public class ContractController {
     private static final String FIRST_PAGE = "1";
     private static final String DEFAULT_PAGE_SIZE = "10";
 
-    @Autowired
-    ContractService contractService;
+
 
     @Autowired
-    PlanService planService;
+    private OrderService orderService;
 
     @Autowired
-    OptionService optionService;
+    private ContractService contractService;
 
     @Autowired
-    CustomerService customerService;
+    private PlanService planService;
 
     @Autowired
-    Cart cart;
+    private OptionService optionService;
+
+    @Autowired
+    private CustomerService customerService;
+
+    @Autowired
+    private Cart cart;
 
     @GetMapping("/contracts")
     public String getContracts(@RequestParam(defaultValue = FIRST_PAGE) Integer page,
@@ -68,14 +73,15 @@ public class ContractController {
     @GetMapping("/contracts/{contractNumber}")
     public String editContract(@PathVariable Long contractNumber, Model model) {
 
-        Contract contract = contractService.getContractByNumber(contractNumber);
+        ContractDto contract = contractService.getContractDtoByNumber(contractNumber);
 
         if (contract == null) {
             return "redirect:/contracts";
         }
 
         model.addAttribute("contract", contract);
-        model.addAttribute("currentPlanOpts", new TreeMap<>(planService.getPlan(contract.getPlan().getPlanName()).getAvailableOptions()));
+        model.addAttribute("customer", customerService.getCustomerByContractNumber(contract.getContractNumber()));
+        model.addAttribute("currentPlanOpts", planService.getPlanDto(contract.getPlan().getPlanName()).getAvailableOptions());
         model.addAttribute("plans", planService.getAllPlans());
 
         return "contracts/edit";
@@ -83,37 +89,32 @@ public class ContractController {
 
     @Secured({"ROLE_CUSTOMER", "ROLE_EMPLOYEE"})
     @PostMapping("/contracts/edit")
-    public String editContract(@ModelAttribute Contract contract, Model model) {
+    public String editContract(@ModelAttribute("contract") ContractDto contractDto, BindingResult result) {
 
-        try {
-             cart.setContract(contract);
-             cart.setPlan(planService.getPlan(contract.getPlan().getId()));
-
-             List<String> connectedNames =
-                     contract.getOptions().stream().map(Option::getName).collect(Collectors.toList());
-
-             cart.setOptions(
-                     optionService.getAvailableOptionsForPlan(contract.getPlan().getPlanName())
-                     .stream().filter(opt -> connectedNames.contains(opt.getName())).collect(Collectors.toList()));
-
-
-//            contractService.updateContract(contract);
-        }
-        catch (TyrannophoneException ex) {
-            model.addAttribute("error", ex.getMessage());
+        if (result.hasErrors()) {
             return "contracts/edit";
         }
 
-        return "redirect:/cart";
+        CustomerDto customerDto = customerService.getCustomerDtoByContractNumber(contractDto.getContractNumber());
+        ContractDto existedContractDto = contractService.getContractDtoByNumber(contractDto.getContractNumber());
+
+        // Determination of order type
+        if (!(existedContractDto.getPlan().getId().equals(contractDto.getPlan().getId()))) {
+            orderService.createPlanOrder(customerDto, contractDto);
+        }
+        else {
+            orderService.createOptionsOrder(customerDto, contractDto);
+        }
+
+        return "redirect:/contracts";
     }
 
     @Secured("ROLE_EMPLOYEE")
     @GetMapping("/contracts/add/{customerId}")
     public String addContract(@PathVariable Long customerId, Model model) {
 
-        Contract contract = new Contract();
+        ContractDto contract = new ContractDto();
         CustomerDto customer = customerService.getCustomerById(customerId);
-
 
         model.addAttribute("customer", customer);
         model.addAttribute("contract", contract);
@@ -128,15 +129,19 @@ public class ContractController {
 
     @Secured("ROLE_EMPLOYEE")
     @PostMapping("/contracts/add/{customerId}")
-    public String addContract(@PathVariable Long customerId, @Valid @ModelAttribute Contract contract, BindingResult result) {
+    public String addContract(@PathVariable Long customerId,
+                              @Valid @ModelAttribute ContractDto contract,
+                              BindingResult result) {
 
         if (result.hasErrors()) {
             return "contracts/add";
         }
 
-        contractService.addContract(contract, customerId);
+        CustomerDto customer = customerService.getCustomerById(customerId);
 
-        return "redirect:/customers/" + contract.getCustomer().getId();
+        orderService.createContractOrder(customer, contract);
+
+        return "redirect:/customers/" + customerId;
     }
 
 

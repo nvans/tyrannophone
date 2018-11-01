@@ -10,7 +10,7 @@
     <div class="collapse navbar-collapse" id="navbarContent">
         <ul class="navbar-nav">
             <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/plans">Plans</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">Page 2</a></li>
+            <%--<li class="nav-item"><a class="nav-link" href="#">Page 2</a></li>--%>
             <li class="nav-item">
 
                 <c:set var="login" value="<a class = \"nav-link\" data-toggle=\"modal\" data-target=\"#login-modal\">Sign in</a>"/>

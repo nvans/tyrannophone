@@ -76,7 +76,7 @@ public class OptionValidationServiceImpl implements OptionValidationService {
     }
 
     @Override
-    public boolean isOptionsCompatible(Set<Option> options) {
+    public boolean areOptionsCompatible(Set<Option> options) {
 
         for (Option optI : options) {
             for (Option optJ : options) {

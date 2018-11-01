@@ -1,13 +1,12 @@
 package com.nvans.tyrannophone.model.dto;
 
-import com.nvans.tyrannophone.model.entity.BlockDetails;
 import com.nvans.tyrannophone.model.entity.Contract;
-import com.nvans.tyrannophone.model.entity.Option;
-import com.nvans.tyrannophone.model.entity.Plan;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ContractDto implements Serializable {
 
@@ -15,54 +14,37 @@ public class ContractDto implements Serializable {
 
     private Long contractNumber;
 
-    private Plan plan;
+    private PlanDto plan;
+
+    private List<PlanOptionDto> options;
 
     private boolean isActive;
 
-    private boolean isReadOnly;
-
-    private Set<Option> compatibleOptions;
-
-    private Set<Option> incompatibleOptions;
-
-    private BlockDetails blockDetails;
-
-
-    public ContractDto(Contract contract, boolean readOnly) {
-
-        if (contract == null) {
-            throw new IllegalArgumentException("Contract can't be null");
-        }
-
-        this.contractNumber = contract.getContractNumber();
-        this.plan = contract.getPlan();
-        this.isActive = contract.isActive();
-        this.isReadOnly = readOnly;
-        this.blockDetails = contract.getBlockDetails();
-
-        this.compatibleOptions = new HashSet<>();
-        this.incompatibleOptions = new HashSet<>();
-
-        for (Option optI : contract.getPlan().getAvailableOptions().keySet()) {
-            for (Option optJ : contract.getPlan().getAvailableOptions().keySet()) {
-                if (optI.equals(optJ)) {
-                    continue;
-                }
-
-                if (optI.getIncompatibleOptions().contains(optJ)) {
-                    incompatibleOptions.add(optJ);
-                }
-                else {
-                    if (incompatibleOptions.contains(optJ)) {
-                        continue;
-                    }
-
-                    compatibleOptions.add(optJ);
-                }
-            }
-        }
+    public ContractDto() {
 
     }
+
+    public ContractDto(Contract contract) {
+
+        this.contractNumber = contract.getContractNumber();
+        this.plan = new PlanDto(contract.getPlan());
+        this.options = contract.getOptions()
+                .stream().map(option -> new PlanOptionDto(option, true)).collect(Collectors.toList());
+
+        options.addAll(contract.getPlan().getAvailableOptions().entrySet().stream()
+                .filter(Map.Entry::getValue) // keep connected
+                .map(entry -> new PlanOptionDto(entry.getKey(), true)) // convert
+                .collect(Collectors.toList()));
+
+        this.isActive = contract.isActive();
+    }
+
+
+    public Integer getPrice() {
+
+        return plan.getConnectionPrice() + options.stream().mapToInt(PlanOptionDto::getPrice).sum();
+    }
+
 
     public Long getContractNumber() {
         return contractNumber;
@@ -72,13 +54,27 @@ public class ContractDto implements Serializable {
         this.contractNumber = contractNumber;
     }
 
-    public Plan getPlan() {
+    public PlanDto getPlan() {
         return plan;
     }
 
-    public void setPlan(Plan plan) {
+    public void setPlan(PlanDto plan) {
         this.plan = plan;
     }
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public List<PlanOptionDto> getOptions() {
+        return options;
+    }
+
+    public void setOptions(List<PlanOptionDto> options) {
+        this.options = options;
+    }
+
+
 
     public boolean isActive() {
         return isActive;
@@ -88,35 +84,8 @@ public class ContractDto implements Serializable {
         isActive = active;
     }
 
-    public boolean isReadOnly() {
-        return isReadOnly;
-    }
-
-    public void setReadOnly(boolean readOnly) {
-        isReadOnly = readOnly;
-    }
-
-    public Set<Option> getCompatibleOptions() {
-        return compatibleOptions;
-    }
-
-    public void setCompatibleOptions(Set<Option> compatibleOptions) {
-        this.compatibleOptions = compatibleOptions;
-    }
-
-    public Set<Option> getIncompatibleOptions() {
-        return incompatibleOptions;
-    }
-
-    public void setIncompatibleOptions(Set<Option> incompatibleOptions) {
-        this.incompatibleOptions = incompatibleOptions;
-    }
-
-    public BlockDetails getBlockDetails() {
-        return blockDetails;
-    }
-
-    public void setBlockDetails(BlockDetails blockDetails) {
-        this.blockDetails = blockDetails;
+    @Override
+    public String toString() {
+        return contractNumber.toString();
     }
 }

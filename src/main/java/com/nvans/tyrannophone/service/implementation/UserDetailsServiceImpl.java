@@ -1,11 +1,9 @@
 package com.nvans.tyrannophone.service.implementation;
 
-import com.nvans.tyrannophone.model.CustomerInfo;
 import com.nvans.tyrannophone.model.dao.GenericDao;
 import com.nvans.tyrannophone.model.entity.Role;
 import com.nvans.tyrannophone.model.entity.User;
-import com.nvans.tyrannophone.model.security.CustomUserPrinciple;
-import com.nvans.tyrannophone.utils.security.ApplicationAuthorities;
+import com.nvans.tyrannophone.model.security.TyrannophoneUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,9 +23,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     GenericDao<User> userDao;
 
-    @Autowired
-    CustomerInfo customerInfo;
-
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
@@ -45,7 +40,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             grantedAuthorities.add(new SimpleGrantedAuthority(role.getRole()));
         }
 
-        return new CustomUserPrinciple(
+        return new TyrannophoneUser(
                 user.getUserName(), user.getPassword(),
                 user.isActive(), user.isActive(),
                 user.isActive(), user.isActive(),

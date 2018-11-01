@@ -18,7 +18,7 @@
         </ul>
         <ul class="navbar-nav ml-auto">
 
-            <li class="nav-item"><a class="navbar-brand <c:if test="${!cart.cartEmpty}">text-warning"</c:if> href="${pageContext.request.contextPath}/cart">Cart</a></li>
+            <li class="nav-item"><a class="navbar-brand text-warning" href="${pageContext.request.contextPath}/cart">Orders</a></li>
         </ul>
     </div>
 </nav>

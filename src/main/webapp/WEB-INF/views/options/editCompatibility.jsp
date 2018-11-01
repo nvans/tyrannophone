@@ -13,7 +13,7 @@
 <div class="container">
     <div class="row">
         <div class="col-8">
-            <form:form method="post" action="/options/editCompatibility" modelAttribute="option">
+            <form:form method="post" action="${pageContext.request.contextPath}/options/${option.id}/editCompatibility" modelAttribute="option">
                 <form:hidden path="id" readonly="true"/>
                 <form:hidden path="name" readonly="true"/>
                 <form:hidden path="price" readonly="true"/>

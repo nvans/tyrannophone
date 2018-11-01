@@ -1,10 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: withb
-  Date: 27.10.2018
-  Time: 19:04
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -12,15 +5,15 @@
     <%@include file="../templates/header.jsp"%>
 </head>
 <body>
-    <%@include file="../templates/navigation.jsp"%>
-    <%@include file="../templates/customer-navigation.jsp"%>
+<%@include file="../templates/navigation.jsp"%>
+<%@include file="../templates/customer-navigation.jsp"%>
 
     <div class="container">
         <div class="card">
-            <div class="card-header">
+            <div class="card-header font-weight-bold">
                 Invoice
                 <strong>${order.orderDate}</strong>
-                <span class="float-right"> <strong>Status:</strong> Completed</span>
+                <span class="float-right"> <strong>Status:</strong> ${order.orderStatus}</span>
             </div>
             <div class="card-body">
                 <div class="row mb-4">
@@ -37,10 +30,10 @@
                     <div class="col-sm-6">
                         <h6 class="mb-3">To:</h6>
                         <div>
-                            <strong>${customer.firstName} ${customer.lastName}</strong>
+                            <strong>${order.customer.firstName} ${order.customer.lastName}</strong>
                         </div>
-                        <div>${customer.address}</div>
-                        <div>Email: ${customer.user.email}</div>
+                        <div>${order.customer.address}</div>
+                        <div>Email: ${order.customer.email}</div>
                         <div>Phone: +${order.contract}</div>
                     </div>
                 </div>
@@ -56,20 +49,14 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td class="text-center">1</td>
-                            <td class="text-left font-weight-bold">Plan</td>
-                            <td class="text-left">"${order.plan.planName}"</td>
-                            <td class="text-right">$${order.plan.connectionPrice}</td>
-                        </tr>
-                        <c:forEach items="${order.options}" var="option" varStatus="i">
-                        <tr>
-                            <td class="text-center">${i.count + 1}</td>
-                            <td class="text-left font-weight-bold">Option</td>
-                            <td class="text-left">${option.name}</td>
-                            <td class="text-right">$${option.price}</td>
-                        </tr>
-                        </c:forEach>
+                            <c:forEach items="${order.invoiceTriples}" var="row" varStatus="counter">
+                                <tr class="font-weight-bold">
+                                    <td>${counter.count}</td>
+                                    <td>${row.val1}</td>
+                                    <td>${row.val2}</td>
+                                    <td class="text-right">$${row.val3}</td>
+                                </tr>
+                            </c:forEach>
                         </tbody>
                     </table>
                 </div>

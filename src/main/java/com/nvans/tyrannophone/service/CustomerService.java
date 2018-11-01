@@ -59,5 +59,7 @@ public interface CustomerService {
 
     List<Customer> getCustomersPage(Integer page, Integer pageSize);
 
-    int getLastPageNumber(Integer pageSize);
+    int getCustomersLastPageNumber(Integer pageSize);
+
+    CustomerDto getCustomerDtoByContractNumber(Long contractNumber);
 }

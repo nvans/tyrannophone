@@ -14,6 +14,7 @@ import com.nvans.tyrannophone.service.helper.CycleFinderService;
 import com.nvans.tyrannophone.service.helper.OptionsGraph;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +43,7 @@ public class OptionServiceImpl implements OptionService {
 
     @Override
     @NotifyShowcase
+    @Secured({"ROLE_EMPLOYEE"})
     public void addIncompatibleOptions(Option option, Set<Option> incompatibleOptions) {
 
         log.info("Add incompatible options for option [" + option.getName() + "]");
@@ -68,7 +70,7 @@ public class OptionServiceImpl implements OptionService {
             opt.setIncompatibleOptions(incompatibleOptionsWithChildren);
         }
 
-        // and otherwise
+        // and vice versa
         for (Option opt : incompatibleOptionsWithChildren) {
             opt.setIncompatibleOptions(optionWithChildren);
         }
@@ -210,17 +212,16 @@ public class OptionServiceImpl implements OptionService {
         // getting persistent objects for each new incompatible option
         // and put it to set.
         Set<Option> newIncompatibleOptions = new HashSet<>();
-        newIncompatibleOptions.addAll(option.getIncompatibleOptions());
+        option.getIncompatibleOptions().forEach(opt ->
+                newIncompatibleOptions.add(optionDao.findById(opt.getId()))
+        );
 
         option.getIncompatibleOptions().forEach(
                 opt -> newIncompatibleOptions.addAll(optionsGraph.getChildren(opt))
         );
 
         // getting prior incompatible options for current option
-        Set<Option> oldIncompatibleOptions = new HashSet<>();
-        optionPO.getIncompatibleOptions().forEach(
-                opt -> oldIncompatibleOptions.addAll(optionsGraph.getChildren(opt))
-        );
+        Set<Option> oldIncompatibleOptions = optionPO.getIncompatibleOptions();
 
         // *** Consistency ***
         // 1. Remove current option from other incompatible set if was switched off
@@ -233,6 +234,8 @@ public class OptionServiceImpl implements OptionService {
         newIncompatibleOptions.forEach(opt -> opt.getIncompatibleOptions().add(optionPO));
 
         optionPO.setIncompatibleOptions(newIncompatibleOptions);
+
+        optionDao.update(optionPO);
     }
 
     @Override

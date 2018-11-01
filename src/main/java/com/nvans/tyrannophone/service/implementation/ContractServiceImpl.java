@@ -2,22 +2,27 @@ package com.nvans.tyrannophone.service.implementation;
 
 import com.nvans.tyrannophone.exception.IncompatibleOptionsException;
 import com.nvans.tyrannophone.exception.TyrannophoneException;
+import com.nvans.tyrannophone.model.CustomerInfo;
 import com.nvans.tyrannophone.model.dao.*;
+import com.nvans.tyrannophone.model.dto.ContractDto;
 import com.nvans.tyrannophone.model.dto.ContractView;
+import com.nvans.tyrannophone.model.dto.PlanDto;
+import com.nvans.tyrannophone.model.dto.PlanOptionDto;
 import com.nvans.tyrannophone.model.entity.*;
-import com.nvans.tyrannophone.model.security.CustomUserPrinciple;
+import com.nvans.tyrannophone.model.security.TyrannophoneUser;
 import com.nvans.tyrannophone.service.ContractService;
+import com.nvans.tyrannophone.service.UserPrincipalFacade;
 import com.nvans.tyrannophone.service.OptionValidationService;
+import com.nvans.tyrannophone.service.PlanService;
 import com.nvans.tyrannophone.service.helper.OptionsGraph;
-import com.nvans.tyrannophone.utils.security.ApplicationAuthorities;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -25,79 +30,108 @@ import java.util.stream.Collectors;
 @Transactional
 public class ContractServiceImpl implements ContractService {
 
-    @Autowired
-    GenericDao<User> userDao;
+    private static final Logger log = Logger.getLogger(ContractServiceImpl.class);
 
     @Autowired
-    PlanDao planDao;
+    private UserPrincipalFacade userPrincipalFacade;
 
     @Autowired
-    ContractDao contractDao;
+    private CustomerInfo customerInfo;
 
     @Autowired
-    CustomerDao customerDao;
+    private GenericDao<User> userDao;
 
     @Autowired
-    OptionDao optionDao;
+    private PlanDao planDao;
 
     @Autowired
-    OptionsGraph optionsGraph;
+    private PlanService planService;
 
     @Autowired
-    OptionValidationService optionValidationService;
+    private ContractDao contractDao;
+
+    @Autowired
+    private CustomerDao customerDao;
+
+    @Autowired
+    private OptionDao optionDao;
+
+    @Autowired
+    private OptionsGraph optionsGraph;
+
+    @Autowired
+    private OptionValidationService optionValidationService;
 
     @Override
     @Transactional(readOnly = true)
+    @Secured({"ROLE_CUSTOMER", "ROLE_EMPLOYEE"})
     public Contract getContractByNumberAndCustomerId(Long contractNumber, Long customerId) {
+        log.info("GetContractByNumberAndCustomerId");
 
         return contractDao.getContractByNumberAndCustomerId(contractNumber, customerId);
     }
 
     @Override
     @Transactional(readOnly = true)
+    @Secured({"ROLE_CUSTOMER", "ROLE_EMPLOYEE"})
     public Contract getContractByNumber(Long contractNumber) {
 
-        CustomUserPrinciple currentUser =
-                (CustomUserPrinciple) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        log.info("GetContractByNumber");
 
-        if (currentUser.getAuthorities().contains(ApplicationAuthorities.EMPLOYEE_AUTHORITY)) {
+        TyrannophoneUser currentUser = userPrincipalFacade.currentUser();
+
+        if (currentUser.isEmployee()) {
 
             return contractDao.getContractByNumber(contractNumber);
         }
-        else if (currentUser.getAuthorities().contains(ApplicationAuthorities.CUSTOMER_AUTHORITY)) {
-
-            return contractDao.getContractByNumberAndCustomerId(contractNumber, currentUser.getUserId());
-        }
-
-        return null;
+       
+        return contractDao.getContractByNumberAndCustomerId(contractNumber, currentUser.getUserId());
     }
 
     @Override
     @Transactional(readOnly = true)
+    @Secured({"ROLE_CUSTOMER", "ROLE_EMPLOYEE"})
+    public ContractDto getContractDtoByNumber(Long contractNumber) {
+
+        log.info("get contract dto by number");
+
+        TyrannophoneUser currentUser = userPrincipalFacade.currentUser();
+
+        if (currentUser.isEmployee()) {
+
+            return new ContractDto(contractDao.getContractByNumber(contractNumber));
+        }
+
+        return new ContractDto(contractDao.getContractByNumberAndCustomerId(contractNumber, currentUser.getUserId()));
+    }
+
+    @Override
+    @Secured({"ROLE_EMPLOYEE"})
+    @Transactional(readOnly = true)
     public List<Contract> getAllContracts() {
 
-        CustomUserPrinciple currentUser =
-                (CustomUserPrinciple) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        log.info("get all contracts");
 
-        if (currentUser.getAuthorities().contains(ApplicationAuthorities.EMPLOYEE_AUTHORITY)) {
+        TyrannophoneUser currentUser = userPrincipalFacade.currentUser();
+
+        if (currentUser.isEmployee()) {
 
             return contractDao.findAll();
         }
-
 
         return contractDao.getAllByCustomerId(currentUser.getUserId());
 
     }
 
     @Override
+    @Secured({"ROLE_CUSTOMER", "ROLE_EMPLOYEE"})
     public List<Contract> getContractsPage(int pageNumber, int pageSize) {
 
         if (pageNumber < 1) {
             pageNumber = 1;
         }
 
-        CustomUserPrinciple currentUser =
-                (CustomUserPrinciple) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        TyrannophoneUser currentUser = userPrincipalFacade.currentUser();
 
         // Calculate last page
         long contractTotal = contractDao.count();
@@ -109,15 +143,15 @@ public class ContractServiceImpl implements ContractService {
             pageNumber = lastPage;
         }
 
-        if (currentUser.getAuthorities().contains(ApplicationAuthorities.EMPLOYEE_AUTHORITY)) {
+        if (currentUser.isEmployee()) {
             return contractDao.getContractPage(pageNumber, pageSize);
         }
-
 
         return contractDao.getAllByCustomerId(currentUser.getUserId());
     }
 
     @Override
+    @Secured({"ROLE_CUSTOMER", "ROLE_EMPLOYEE"})
     public int getLastPageNumber(int pageSize) {
 
         long contractTotal = contractDao.count();
@@ -129,19 +163,16 @@ public class ContractServiceImpl implements ContractService {
     }
 
     @Override
+    @Secured({"ROLE_CUSTOMER", "ROLE_EMPLOYEE"})
     public void blockContract(Long contractNumber, String reason) {
 
-        CustomUserPrinciple currentUser =
-                (CustomUserPrinciple) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        TyrannophoneUser currentUser = userPrincipalFacade.currentUser();
 
         Contract contract = contractDao.getContractByNumber(contractNumber);
 
-        boolean isEmployee = currentUser.getAuthorities().contains(ApplicationAuthorities.EMPLOYEE_AUTHORITY);
+        boolean isSelfBlock = currentUser.getUserId().equals(contract.getCustomer().getId());
 
-        boolean isSelfBlock =
-                currentUser.getUserId().equals(contract.getCustomer().getId());
-
-        if (isEmployee || isSelfBlock) {
+        if (currentUser.isEmployee() || isSelfBlock) {
             contract.setActive(false);
 
             BlockDetails blockDetails = new BlockDetails();
@@ -153,26 +184,28 @@ public class ContractServiceImpl implements ContractService {
     }
 
     @Override
+    @Secured({"ROLE_CUSTOMER", "ROLE_EMPLOYEE"})
     public void unblockContract(Long contractNumber) {
 
-        CustomUserPrinciple currentUser =
-                (CustomUserPrinciple) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        TyrannophoneUser currentUser = userPrincipalFacade.currentUser();
 
         Contract contract = contractDao.getContractByNumber(contractNumber);
 
         User blockInitiator = contract.getBlockDetails().getBlockedByUser();
 
-        boolean isSelfUnblock = blockInitiator != null && blockInitiator.getId().equals(currentUser.getUserId());
-        boolean isEmployee = currentUser.getAuthorities().contains(ApplicationAuthorities.EMPLOYEE_AUTHORITY);
+        boolean isSelfUnblock = (blockInitiator != null) && (blockInitiator.getId().equals(currentUser.getUserId()));
 
-        if (isEmployee || isSelfUnblock) {
+        if (currentUser.isEmployee() || isSelfUnblock) {
             contract.setActive(true);
             contract.setBlockDetails(null);
         }
     }
 
     @Override
-    public void addContract(Contract contract, Long customerId) {
+    @Secured({"ROLE_EMPLOYEE"})
+    public void addContract(ContractDto contract, Long customerId) {
+
+        log.info("add contract");
 
         if (contract.getContractNumber() == null) {
             throw new TyrannophoneException("Contract number mustn't be empty");
@@ -187,86 +220,163 @@ public class ContractServiceImpl implements ContractService {
 //        }
 
         Set<Option> optionsToConnect = new HashSet<>();
+        optionsToConnect.addAll(contract.getOptions().stream()
+                .map(opt -> optionDao.findById(opt.getId())) // retrieve options
+                .collect(Collectors.toList()));
 
-        for (Option opt : contract.getOptions()) {
-            optionsToConnect.addAll(optionsGraph.getParents(opt));
-        }
+        // Add parents
+        optionsToConnect.forEach(option -> optionsToConnect.addAll(optionsGraph.getParents(option)));
 
-        if(! optionValidationService.isOptionsCompatible(optionsToConnect)) {
+        if(!(optionValidationService.areOptionsCompatible(optionsToConnect))) {
             throw new IncompatibleOptionsException("Selected options are incompatible");
         }
 
-        if (!contract.isActive() && contract.getBlockDetails() == null) {
+        Contract contractToSave = new Contract();
+        contractToSave.setContractNumber(contract.getContractNumber());
+        contractToSave.setPlan(planDao.findById(contract.getPlan().getId()));
+        contractToSave.setOptions(optionsToConnect);
+        contractToSave.setActive(contract.isActive());
+
+        if (!contractToSave.isActive()) {
             BlockDetails blockDetails = new BlockDetails();
             blockDetails.setReason("Not activated yet.");
-            contract.setBlockDetails(blockDetails);
+            contractToSave.setBlockDetails(blockDetails);
         }
 
         Customer customer = customerDao.findById(customerId);
+        customer.setBalance(customer.getBalance() - contract.getPrice());
 
-        if (customer == null) {
-            throw new TyrannophoneException("Customer can't be null");
-        }
+        contractToSave.setCustomer(customer);
+        contractDao.save(contractToSave);
 
-        contract.setOptions(optionsToConnect);
-        customer.setBalance(customer.getBalance() - contract.getMonthlyPrice());
-
-        contract.setCustomer(customer);
-        contractDao.update(contract);
+        customerInfo.update();
     }
 
     @Override
-    public void updateContract(Contract contract) {
+    @Secured({"ROLE_CUSTOMER", "ROLE_EMPLOYEE"})
+    public void updateContractFull(ContractDto contract) {
+
+        log.info("Update contract full");
 
         if (!(contract.isActive())) {
             throw new TyrannophoneException("The contract is blocked!");
         }
 
-        Plan plan = planDao.findByName(contract.getPlan().getPlanName());
+        PlanDto plan = planService.getPlan(contract.getPlan().getId());
 
-        Set<Option> availableOptions = plan.getAvailableOptions().keySet();
-        Set<Option> mandatoryOptions = plan.getAvailableOptions().entrySet()
-                .stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toSet());
-        Set<Option> connectedOptions = contract.getOptions();
+        List<PlanOptionDto> availableOptions = plan.getAvailableOptions();
+        List<PlanOptionDto> mandatoryOptions = plan.getConnectedOptions();
+
+        List<PlanOptionDto> connectedOptions = contract.getOptions();
 
         if(!(availableOptions.containsAll(connectedOptions) && connectedOptions.containsAll(mandatoryOptions))){
             throw new IncompatibleOptionsException("These options are not available for this plan");
         }
 
         Set<Option> optionsToConnect = new HashSet<>();
+        contract.getOptions().forEach(option -> {
+            Option optionPO = optionDao.findById(option.getId());
 
-        for (Option opt : contract.getOptions()) {
-            optionsToConnect.addAll(optionsGraph.getParents(opt));
-        }
+            optionsToConnect.add(optionPO);
+            optionsToConnect.addAll(optionsGraph.getParents(optionPO));
+        });
 
-        if(!(optionValidationService.isOptionsCompatible(optionsToConnect))) {
+
+        if(!(optionValidationService.areOptionsCompatible(optionsToConnect))) {
             throw new IncompatibleOptionsException("Selected options are incompatible");
         }
 
         Contract contractPO = contractDao.getContractByNumber(contract.getContractNumber());
-        contractPO.setPlan(contract.getPlan());
+        contractPO.setPlan(planDao.findById(plan.getId()));
         contractPO.setOptions(optionsToConnect);
+
+        Customer customer = customerDao.getByContractNumber(contract.getContractNumber());
+
+        Integer newBalance = customer.getBalance() - contract.getPrice();
+
+        if (newBalance < 0) {
+            throw new TyrannophoneException("Not enough balance");
+        }
+
+        customer.setBalance(newBalance);
+
+        contractDao.save(contractPO);
+
+        customerInfo.update();
     }
 
     @Override
+    @Secured({"ROLE_CUSTOMER", "ROLE_EMPLOYEE"})
+    public void updateContractOptions(ContractDto contract) {
+
+        log.info("Update contract options");
+
+        if (!(contract.isActive())) {
+            throw new TyrannophoneException("The contract is blocked!");
+        }
+
+        PlanDto plan = planService.getPlan(contract.getPlan().getId());
+
+        List<PlanOptionDto> availableOptions = plan.getAvailableOptions();
+        List<PlanOptionDto> mandatoryOptions = plan.getConnectedOptions();
+
+        List<PlanOptionDto> connectedOptions = contract.getOptions();
+
+
+        if(!(availableOptions.containsAll(connectedOptions) && connectedOptions.containsAll(mandatoryOptions))){
+            throw new IncompatibleOptionsException("These options are not available for this plan");
+        }
+
+        Set<Option> optionsToConnect = new HashSet<>();
+        optionsToConnect.addAll(connectedOptions.stream()
+                .map(opt -> optionDao.findById(opt.getId()))
+                .collect(Collectors.toSet()));
+
+        if(!(optionValidationService.areOptionsCompatible(optionsToConnect))) {
+            throw new IncompatibleOptionsException("Selected options are incompatible");
+        }
+
+        Contract contractPO = contractDao.getContractByNumber(contract.getContractNumber());
+        contractPO.setPlan(planDao.findById(plan.getId()));
+
+
+        Set<Option> newOptions = new HashSet<>(optionsToConnect);
+        newOptions.removeAll(contractPO.getOptions());
+
+
+        // Cost =  ConnectedOptions - toConnect
+        int totalCost = newOptions.stream().mapToInt(Option::getPrice).sum();
+
+
+        totalCost = totalCost < 0 ? 0 : totalCost;
+
+        contractPO.setOptions(optionsToConnect);
+
+        Customer customer = customerDao.getByContractNumber(contract.getContractNumber());
+
+        Integer newBalance = customer.getBalance() - totalCost;
+
+        if (newBalance < 0) {
+            throw new TyrannophoneException("Not enough balance");
+        }
+
+        customer.setBalance(newBalance);
+
+        contractDao.save(contractPO);
+
+        customerInfo.update();
+    }
+
+    @Override
+    @Secured({"ROLE_CUSTOMER", "ROLE_EMPLOYEE"})
     public ContractView getContractView(Long contractNumber) {
 
-        CustomUserPrinciple currentUser =
-                (CustomUserPrinciple) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        TyrannophoneUser currentUser = userPrincipalFacade.currentUser();
 
-        Contract contract = null;
+        Contract contract = currentUser.isEmployee() ?
+                contractDao.getContractByNumber(contractNumber) :
+                contractDao.getContractByNumberAndCustomerId(contractNumber, currentUser.getUserId());
 
-        if (currentUser.getAuthorities().contains(ApplicationAuthorities.EMPLOYEE_AUTHORITY)) {
-            contract = contractDao.getContractByNumber(contractNumber);
-        }
-        else if (currentUser.getAuthorities().contains(ApplicationAuthorities.CUSTOMER_AUTHORITY)) {
-            contract = contractDao.getContractByNumberAndCustomerId(contractNumber, currentUser.getUserId());
-        }
-
-        if (contract != null) {
-            return new ContractView(contract);
-        }
-
-        return null;
+        return (contract != null) ? new ContractView(contract) : null;
     }
 }

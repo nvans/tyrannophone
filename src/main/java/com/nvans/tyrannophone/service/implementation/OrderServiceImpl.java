@@ -1,26 +1,22 @@
 package com.nvans.tyrannophone.service.implementation;
 
-import com.nvans.tyrannophone.exception.TyrannophoneException;
 import com.nvans.tyrannophone.model.Order;
-import com.nvans.tyrannophone.model.cart.Cart;
-import com.nvans.tyrannophone.model.dao.ContractDao;
-import com.nvans.tyrannophone.model.dao.CustomerDao;
+import com.nvans.tyrannophone.model.OrderStatus;
+import com.nvans.tyrannophone.model.OrderType;
+import com.nvans.tyrannophone.model.cart.OrderCart;
 import com.nvans.tyrannophone.model.dao.OptionDao;
-import com.nvans.tyrannophone.model.dao.PlanDao;
+import com.nvans.tyrannophone.model.dto.ContractDto;
+import com.nvans.tyrannophone.model.dto.CustomerDto;
 import com.nvans.tyrannophone.model.dto.PlanOptionDto;
-import com.nvans.tyrannophone.model.entity.Contract;
-import com.nvans.tyrannophone.model.entity.Customer;
 import com.nvans.tyrannophone.model.entity.Option;
-import com.nvans.tyrannophone.model.security.CustomUserPrinciple;
 import com.nvans.tyrannophone.service.*;
-import com.nvans.tyrannophone.utils.security.ApplicationAuthorities;
+import com.nvans.tyrannophone.service.helper.OptionsGraph;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,77 +24,99 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
-    private ContractDao contractDao;
+    private OrderService orderService;
 
     @Autowired
-    private CustomerDao customerDao;
-
-    @Autowired
-    private PlanDao planDao;
+    private ContractService contractService;
 
     @Autowired
     private OptionDao optionDao;
 
     @Autowired
-    private OptionValidationService optionValidationService;
+    private OptionsGraph optionsGraph;
 
     @Autowired
-    private Cart cart;
+    private OrderCart orderCart;
+
+    public void createContractOrder(CustomerDto customer, ContractDto contract) {
+
+        Order order = new Order(customer, contract);
+        order.setOrderType(OrderType.CONTRACT);
+
+        orderCart.addOrder(order);
+    }
+
+    public void createPlanOrder(CustomerDto customer, ContractDto contract) {
+        Order order = new Order(customer, contract);
+        order.setOrderType(OrderType.PLAN);
+
+        orderCart.addOrder(order);
+    }
+
+    public void createOptionsOrder(CustomerDto customer, ContractDto contract) {
+
+        ContractDto existedContractDto = contractService.getContractDtoByNumber(contract.getContractNumber());
+
+        Set<Option> optionsToConnect = new HashSet<>();
+
+        contract.getOptions().forEach(option -> {
+            Option optionPO = optionDao.findById(option.getId());
+            optionsToConnect.add(optionPO);
+            optionsToConnect.addAll(optionsGraph.getParents(optionPO));
+        });
+
+        contract.setOptions(optionsToConnect.stream().map(PlanOptionDto::new).collect(Collectors.toList()));
+
+        Order order = new Order(customer, contract, existedContractDto.getOptions());
+        order.setOrderType(OrderType.OPTIONS);
+
+        orderCart.addOrder(order);
+    }
+
 
     @Override
     public void processOrder(Order order) {
 
-        if (order == null) return;
-
-        CustomUserPrinciple userPrinciple =
-                (CustomUserPrinciple) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        Customer customer = customerDao.getByContractNumber(order.getContract());
-
-        boolean isEmployee = userPrinciple.getAuthorities().contains(ApplicationAuthorities.EMPLOYEE_AUTHORITY);
-        boolean isValidCustomer = customer.getId().equals(userPrinciple.getUserId());
-
-        if(!(isEmployee || isValidCustomer)) {
-            throw new TyrannophoneException("Can't process order");
+        switch (order.getOrderType()) {
+            case CONTRACT:
+                orderService.processContractOrder(order); break;
+            case PLAN:
+                orderService.processPlanOrder(order); break;
+            case OPTIONS:
+                orderService.processOptionsOrder(order); break;
         }
 
-        order.setOrderDate(LocalDateTime.now());
-        order.setPrice(order.getPlan().getConnectionPrice()
-                + order.getOptions().stream().mapToInt(PlanOptionDto::getPrice).sum());
-
-
-
-        if (customer.getBalance() - order.getPrice() < 0) {
-            throw new TyrannophoneException("Your balance is not enough.");
-        }
-
-        Set<Option> contractOptions = order.getOptions()
-                .stream().map(o -> optionDao.findById(o.getId())).collect(Collectors.toSet());
-
-        if (!(optionValidationService.isOptionsCompatible(contractOptions))) {
-            throw new TyrannophoneException("These options aren't compatible");
-        }
-
-        Contract contract = null;
-
-        if (!isEmployee) {
-            contract = contractDao.getContractByNumberAndCustomerId(order.getContract(), userPrinciple.getUserId());
-        }
-        else {
-            contract = contractDao.getContractByNumber(order.getContract());
-        }
-
-        if(!(contract.isActive())) {
-            throw new TyrannophoneException("Contract is suspended");
-        }
-
-        contract.setPlan(planDao.findById(order.getPlan().getId()));
-        contract.setOptions(contractOptions);
-
-        customer.setBalance(customer.getBalance() - order.getPrice());
-
-        contractDao.save(contract);
-
-        cart.clearCart();
     }
+
+    @Override
+    public void processContractOrder(Order order) {
+
+        order.setOrderStatus(OrderStatus.PROCESSING);
+
+        contractService.addContract(order.getContract(), order.getCustomer().getCustomerId());
+
+        order.setOrderStatus(OrderStatus.COMPLETED);
+    }
+
+    @Override
+    public void processPlanOrder(Order order) {
+
+        order.setOrderStatus(OrderStatus.PROCESSING);
+
+        contractService.updateContractFull(order.getContract());
+
+        order.setOrderStatus(OrderStatus.COMPLETED);
+    }
+
+    @Override
+    public void processOptionsOrder(Order order) {
+
+        order.setOrderStatus(OrderStatus.PROCESSING);
+
+        contractService.updateContractOptions(order.getContract());
+
+        order.setOrderStatus(OrderStatus.COMPLETED);
+    }
+
+
 }

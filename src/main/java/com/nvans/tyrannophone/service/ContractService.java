@@ -1,5 +1,6 @@
 package com.nvans.tyrannophone.service;
 
+import com.nvans.tyrannophone.model.dto.ContractDto;
 import com.nvans.tyrannophone.model.dto.ContractView;
 import com.nvans.tyrannophone.model.entity.Contract;
 
@@ -17,6 +18,8 @@ public interface ContractService {
      * @return single contract representation.
      */
     Contract getContractByNumber(Long contractNumber);
+
+    ContractDto getContractDtoByNumber(Long contractNumber);
 
 
     /**
@@ -45,10 +48,30 @@ public interface ContractService {
      */
     void unblockContract(Long contractNumber);
 
+    /**
+     *
+     * Creates new contract
+     *
+     * @param contract contract DTO
+     * @param customerId customer's id
+     */
+    void addContract(ContractDto contract, Long customerId);
 
-    void addContract(Contract contract, Long customerId);
+    /**
+     * Updates full contract: plan and options
+     *
+     * @param contract contract dto
+     */
+    void updateContractFull(ContractDto contract);
 
-    void updateContract(Contract contract);
+    /**
+     *  Updates only options for contract
+     *
+     * @param contract
+     */
+    void updateContractOptions(ContractDto contract);
 
     ContractView getContractView(Long contractNumber);
+
+
 }

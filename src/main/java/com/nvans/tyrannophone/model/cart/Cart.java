@@ -16,6 +16,8 @@ import java.util.List;
 @SessionScope
 public class Cart {
 
+    private Long customerId;
+
     private Contract contract;
 
     private PlanDto plan;
@@ -46,6 +48,15 @@ public class Cart {
     // <-- Methods
 
     // Getters and setters -->
+
+    public Long getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
+    }
+
     public PlanDto getPlan() {
         return plan;
     }

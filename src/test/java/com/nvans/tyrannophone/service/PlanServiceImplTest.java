@@ -5,7 +5,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 //@RunWith(MockitoJUnitRunner.class)
-public class PlanServiceTest {
+public class PlanServiceImplTest {
 
 //    @Mock
 //    PlanService planService;

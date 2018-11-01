@@ -3,7 +3,10 @@ package com.nvans.tyrannophone.config;
 import com.nvans.tyrannophone.model.dao.GenericDao;
 import com.nvans.tyrannophone.model.dao.implementation.GenericDaoImpl;
 import com.nvans.tyrannophone.model.entity.*;
+import com.nvans.tyrannophone.model.security.TyrannophoneUser;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 public class DaoBeans {
 
